@@ -3,12 +3,21 @@ import GlobalController from '@/lib/global_controller'
 import Variation from '@/lib/variation'
 import Visualization from '@/lib/visualization'
 import {
+  GrainRounded,
+  LayersRounded,
+  SettingsRounded,
+  SsidChartRounded,
+  TuneRounded,
+} from '@mui/icons-material'
+import {
   Button,
   CircularProgress,
+  Divider,
   Option,
   Select,
   Slider,
   ToggleButtonGroup,
+  Tooltip,
   Typography,
 } from '@mui/joy'
 import { useRouter } from 'next/router'
@@ -95,6 +104,7 @@ export default function VisScatterBlock({
     <div className="vis-container mb-10 max-w-full">
       <div className="flex items-stretch justify-evenly px-2 gap-2">
         <Select
+          startDecorator={<TuneRounded />}
           className="grow-1"
           value={variation}
           placeholder="Variation"
@@ -108,6 +118,7 @@ export default function VisScatterBlock({
         </Select>
 
         <Select
+          startDecorator={<LayersRounded />}
           className="grow-1"
           value={channel}
           placeholder="Channel"
@@ -121,60 +132,77 @@ export default function VisScatterBlock({
         </Select>
 
         <ToggleButtonGroup
-          className="grow-1"
           value={renderStyle}
           onChange={(_, value) => setRenderStyle(value || 'dots')}
           aria-label="Render style"
-          size="sm"
         >
-          <Button className="grow-1" value="dots">
-            Dots
-          </Button>
-          <Button className="grow-1" value="lines-tail">
-            Tails
-          </Button>
+          <Tooltip arrow variant="outlined" title="Dots">
+            <Button value="dots">
+              <GrainRounded />
+            </Button>
+          </Tooltip>
+
+          <Tooltip arrow variant="outlined" title="Lines (tail)">
+            <Button value="lines-tail">
+              <SsidChartRounded />
+            </Button>
+          </Tooltip>
           {/* <Button className="grow-1" value="dots-tail">Budget-mode Tail</Button> */}
           {/* <Button className="grow-1" value="lines-tail">Totally Accurate Tail Simulation</Button> */}
         </ToggleButtonGroup>
-      </div>
 
-      {renderStyle === 'dots-tail' ? (
-        <div className="flex items-center justify-evenly -mt-1 -mb-3 pl-2.5 pr-4">
-          <label className="min-w-35">Tail Falloff</label>
-          <Slider
-            aria-label="Tail falloff"
-            value={tailFalloff}
-            onChange={(_, value) => setTailFalloff(value as number)}
-            max={100}
-            size="sm"
-          />
-        </div>
-      ) : null}
+        <Tooltip
+          arrow
+          placement="bottom-end"
+          variant="outlined"
+          title={
+            <div className="w-80 pl-2.5 pr-4">
+              <div className="flex items-center justify-evenly -mb-3">
+                <label className="min-w-18">Radius</label>
+                <Slider
+                  aria-label="Radius"
+                  value={radius * radiusResolution}
+                  onChange={(_, value) =>
+                    setRadius((value as number) / radiusResolution)
+                  }
+                  min={1 * radiusResolution}
+                  max={20 * radiusResolution}
+                  size="sm"
+                />
+              </div>
 
-      <div className="flex items-center justify-evenly -mb-3 pl-2.5 pr-4">
-        <label className="min-w-35">Radius</label>
-        <Slider
-          aria-label="Radius"
-          value={radius * radiusResolution}
-          onChange={(_, value) =>
-            setRadius((value as number) / radiusResolution)
+              <div className="flex items-center justify-evenly">
+                <label className="min-w-18">Opacity</label>
+                <Slider
+                  aria-label="Opacity"
+                  value={opacity}
+                  onChange={(_, value) => setOpacity(value as number)}
+                  min={0}
+                  max={100}
+                  size="sm"
+                />
+              </div>
+
+              <Divider>Tail</Divider>
+
+              <div className="flex items-center justify-evenly">
+                <label className="min-w-18">Falloff</label>
+                <Slider
+                  disabled={!renderStyle.endsWith('tail')}
+                  aria-label="Tail falloff"
+                  value={tailFalloff}
+                  onChange={(_, value) => setTailFalloff(value as number)}
+                  max={100}
+                  size="sm"
+                />
+              </div>
+            </div>
           }
-          min={1 * radiusResolution}
-          max={20 * radiusResolution}
-          size="sm"
-        />
-      </div>
-
-      <div className="flex items-center justify-evenly -mb-3 pl-2.5 pr-4">
-        <label className="min-w-35">Opacity</label>
-        <Slider
-          aria-label="Opacity"
-          value={opacity}
-          onChange={(_, value) => setOpacity(value as number)}
-          min={0}
-          max={100}
-          size="sm"
-        />
+        >
+          <Button sx={{ padding: 1 }}>
+            <SettingsRounded />
+          </Button>
+        </Tooltip>
       </div>
 
       {/* <div className="flex items-center justify-evenly mb-0 pl-2.5 pr-4">
@@ -191,19 +219,17 @@ export default function VisScatterBlock({
             className="absolute"
             style={{ top: 'calc(50% - 20px)', left: 'calc(50% - 20px)' }}
           >
-            <CircularProgress value={isNaN(loadPercentage) ? undefined : loadPercentage} size="lg">
+            <CircularProgress
+              value={isNaN(loadPercentage) ? undefined : loadPercentage}
+              size="lg"
+            >
               <Typography>
                 {isNaN(loadPercentage) ? '' : `${Math.trunc(loadPercentage)}%`}
               </Typography>
             </CircularProgress>
           </div>
         ) : null}
-        <canvas
-          ref={canvas}
-          id="canvas"
-          width="1024px"
-          height="1024px"
-        ></canvas>
+        <canvas ref={canvas} width="1024px" height="1024px"></canvas>
       </div>
     </div>
   )

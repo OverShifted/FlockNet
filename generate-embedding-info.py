@@ -9,17 +9,23 @@ def get_fpFormat(format: str) -> dict[str, int] | str:
 	else:
 		return 'standard'
 
+def gen_class(webapp_root, name, image):
+	return {
+		'name': name,
+		'image': '/' + str(embedding.joinpath(image).relative_to(webapp_root))
+	}
 
 captures = []
-for embedding in embeddings.iterdir():
+for embedding in sorted(embeddings.iterdir()):
 	if embedding.is_dir():
 		metadata_file = embedding.joinpath('capture.json')
 		if metadata_file.exists():
+			print("Processing", embedding)
 			metadata = json.load(metadata_file.open())
 			ts_metadata = {
 				'name': metadata.get('name'),
 				'frameCount': metadata.get('frameCount'),
-				'classes': [{ 'name': name, 'image': '/' + str(embedding.joinpath(image).relative_to(webapp_root)) } for name, image in metadata.get('classes', [])],
+				'classes': [gen_class(webapp_root, name, image) for name, image in metadata.get('classes', [])],
 
 				'variations': [
 					{

@@ -25,12 +25,12 @@ class Pending {
   }
 
   onResolve(value: NDArray[] | PromiseLike<NDArray[]>) {
-    this.wishlist.forEach(w => w.resolve(value))
+    this.wishlist.forEach((w) => w.resolve(value))
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onReject(reason?: any) {
-    this.wishlist.forEach(w => w.reject(reason))
+    this.wishlist.forEach((w) => w.reject(reason))
   }
 
   addWish(wish: Wish) {
@@ -85,8 +85,7 @@ class _AssetManager {
         this.pending.delete(url)
 
         setTimeout(
-          () =>
-            alert('Could not load data. See console for more information.'),
+          () => alert('Could not load data. See console for more information.'),
           400,
         )
       }).bind(this)
@@ -104,7 +103,9 @@ class _AssetManager {
 
       xhr.addEventListener('progress', (e) => {
         const percentage = e.lengthComputable ? (e.loaded * 100) / e.total : NaN
-        console.log(`Loaded ${percentage.toFixed(1)}% of ${url} (${e.loaded}/${e.total})`)
+        console.log(
+          `Loaded ${percentage.toFixed(1)}% of ${url} (${e.loaded}/${e.total})`,
+        )
         pending.onProgress(percentage)
       })
 
@@ -115,16 +116,16 @@ class _AssetManager {
   }
 
   revokePendingRequests(requesterId: string) {
-    this.pending.forEach(pending => {
-      pending.wishlist = pending.wishlist.filter(wish => wish.makerId != requesterId)
+    this.pending.forEach((pending) => {
+      pending.wishlist = pending.wishlist.filter(
+        (wish) => wish.makerId != requesterId,
+      )
 
-      if (pending.wishlist.length === 0)
-        pending.xhr.abort()
+      if (pending.wishlist.length === 0) pending.xhr.abort()
     })
 
     for (const [url, pending] of this.pending) {
-      if (pending.wishlist.length === 0)
-        this.pending.delete(url)
+      if (pending.wishlist.length === 0) this.pending.delete(url)
     }
   }
 }

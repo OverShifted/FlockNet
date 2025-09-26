@@ -13,8 +13,7 @@ import {
 } from '@mui/joy'
 import React, { useEffect, useState } from 'react'
 import GlobalController from '@/lib/global_controller'
-import DarkModeIcon from '@mui/icons-material/DarkMode'
-import LightModeIcon from '@mui/icons-material/LightMode'
+import { DarkModeRounded, LightModeRounded } from '@mui/icons-material'
 import captures from '@/lib/captures'
 import Head from 'next/head'
 import ClassChips from '@/components/class_chips'
@@ -65,7 +64,7 @@ const ThemeToggleButton = () => {
         },
       }}
     >
-      {mode === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
+      {mode === 'light' ? <DarkModeRounded /> : <LightModeRounded />}
     </IconButton>
   )
 }
@@ -136,7 +135,7 @@ export default function Home() {
 
       <Head>
         <title>NNVis</title>
-        <link rel="icon" href={router.basePath + "/favicon.ico"} />
+        <link rel="icon" href={router.basePath + '/favicon.ico'} />
       </Head>
 
       <Box

@@ -8,16 +8,25 @@ import {
   CssVarsProvider,
   extendTheme,
   IconButton,
+  Input,
   Link,
+  Option,
+  Select,
+  Tooltip,
   useColorScheme,
 } from '@mui/joy'
 import React, { useEffect, useState } from 'react'
 import GlobalController from '@/lib/global_controller'
-import { DarkModeRounded, LightModeRounded } from '@mui/icons-material'
+import {
+  CastForEducationRounded,
+  DarkModeRounded,
+  LightModeRounded,
+  NumbersRounded,
+} from '@mui/icons-material'
 import captures from '@/lib/captures'
 import Head from 'next/head'
 import ClassChips from '@/components/class_chips'
-import Options from '@/components/options'
+import { ColormapSelect } from '@/components/options'
 import { useRouter } from 'next/router'
 
 const geistMono = Geist_Mono({
@@ -32,7 +41,7 @@ const customTheme = extendTheme({
   },
 })
 
-const ThemeToggleButton = () => {
+function ThemeToggleButton() {
   const { mode, setMode } = useColorScheme()
 
   const toggleTheme = () => {
@@ -51,12 +60,13 @@ const ThemeToggleButton = () => {
 
   return (
     <IconButton
-      variant="outlined"
+      variant="plain"
       color="neutral"
       onClick={toggleTheme}
       sx={{
         width: 50,
         height: 50,
+        marginY: 'auto',
         borderRadius: '100%',
         borderWidth: 2,
         '& svg': {
@@ -126,11 +136,7 @@ export default function Home() {
   const router = useRouter()
 
   return (
-    <CssVarsProvider
-      theme={customTheme}
-      disableTransitionOnChange
-      modeStorageKey="mode-toggle-demo"
-    >
+    <CssVarsProvider theme={customTheme} disableTransitionOnChange>
       <CssBaseline />
 
       <Head>
@@ -139,7 +145,7 @@ export default function Home() {
       </Head>
 
       <Box
-        className="w-full px-15 pt-0 pb-3 mb-10 text-center"
+        className="w-full px-10 pt-0 pb-3 mb-10 text-center"
         sx={(theme) => ({
           // backgroundColor: theme.vars.palette.primary[200],
           // color: theme.vars.palette.primary[900]
@@ -168,29 +174,84 @@ export default function Home() {
 
         <h1 className="text-2xl mr-4 pt-7">Neural Network Visualizer</h1> */}
 
-        <Box className="flex pt-6">
-          <Box className={`flex items-center gap-2 ${geistMono.className}`}>
-            by
-            <Link
-              className={geistMono.className}
-              href="https://overshifted.github.io/"
+        <Box className="flex justify-between pt-6 flex-col gap-5 lg:flex-row lg:gap-0">
+          <Box className="flex flex-col items-start">
+            <Tooltip
+              title="Neural Network Visualizer"
+              arrow
+              variant="outlined"
+              placement="right"
             >
-              <div
-                className="w-5 h-5 mr-2"
-                style={{
-                  backgroundColor: 'rgb(74, 153, 255)',
-                }}
-              />
-              OverShifted
-            </Link>
+              <h1 className="text-2xl my-auto">NNVis</h1>
+            </Tooltip>
+
+            <Box className="top-8 left-8 flex items-center gap-1" fontSize={15}>
+              by
+              <Link href="https://overshifted.github.io/" fontSize={15}>
+                <div
+                  className="w-3.5 h-3.5 mr-1 my-auto"
+                  style={{
+                    backgroundColor: 'rgb(74, 153, 255)',
+                  }}
+                />
+                OverShifted
+              </Link>
+            </Box>
           </Box>
 
-          <h1 className="text-2xl m-auto">Neural Network Visualizer</h1>
+          <Box className="flex gap-2 flex-col sm:flex-row">
+            <Box className="my-auto">
+              <Tooltip title="Capture" arrow variant="outlined">
+                <Select
+                  value={captureIdx}
+                  onChange={(_e, idx: number | null) => {
+                    setCaptureIdx(idx as number)
+                  }}
+                  // variant="plain"
+                  startDecorator={<CastForEducationRounded />}
+                >
+                  {captures.map((cap, idx) => (
+                    <Option key={idx} value={idx}>
+                      {cap.name}
+                    </Option>
+                  ))}
+                </Select>
+              </Tooltip>
+            </Box>
 
+            <Box className="my-auto">
+              <Tooltip title="# of visualizations" arrow variant="outlined">
+                <Input
+                  type="number"
+                  value={Math.max(plotCount, 1)}
+                  onChange={(e) =>
+                    setPlotCount(parseInt(e.target.value) || plotCount)
+                  }
+                  sx={{ textAlign: 'center' }}
+                  className="sm:w-30"
+                  slotProps={{ input: { min: 0 } }}
+                  // variant="plain"
+                  startDecorator={<NumbersRounded />}
+                />
+              </Tooltip>
+            </Box>
+
+            <Box className="my-auto">
+              <Tooltip title="Colormap" arrow variant="outlined">
+                <div>
+                  <ColormapSelect
+                    colorMaps={colorMapKeys}
+                    colorMap={colorMap}
+                    setColorMap={setColorMap}
+                  />
+                </div>
+              </Tooltip>
+            </Box>
+          </Box>
           <ThemeToggleButton />
         </Box>
 
-        <Options
+        {/* <Options
           plotCount={plotCount}
           setPlotCount={setPlotCount}
           captures={captures}
@@ -199,7 +260,7 @@ export default function Home() {
           colorMaps={colorMapKeys}
           colorMap={colorMap}
           setColorMap={setColorMap}
-        />
+        /> */}
 
         <Box className="flex flex-wrap justify-center pt-8">
           <ClassChips capture={capture} colorMap={colorMap} />

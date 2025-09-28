@@ -47,11 +47,16 @@ export default function PlaybackControl({ maxFrame }: PlaybackControlProps) {
           }}
           min={1}
           max={maxFrame}
-          sx={{
-            '--Slider-railBackground': '#c7c7c7', // unfilled part (optional)
-            '&:hover': {
-              '--Slider-railBackground': '#999', // darker on hover
-            },
+          sx={(theme) => {
+            const light = theme.palette.mode == 'light'
+
+            return {
+              '--Slider-railBackground': light ? '#fff' : '#111',
+
+              '&:hover': {
+                '--Slider-railBackground': light ? '#f7f7f7' : '#171717',
+              },
+            }
           }}
         />
 

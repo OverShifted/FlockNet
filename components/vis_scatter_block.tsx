@@ -103,33 +103,45 @@ export default function VisScatterBlock({
   return (
     <div className="vis-container mb-10 max-w-full">
       <div className="flex items-stretch justify-evenly px-2 gap-2">
-        <Select
-          startDecorator={<TuneRounded />}
-          className="grow-1"
-          value={variation}
-          placeholder="Variation"
-          onChange={(_, value) => setVariation(value || 0)}
+        <Tooltip
+          arrow
+          variant="outlined"
+          title="Variation: different smoothness levels and floating point formats"
         >
-          {variations.map((v, index) => (
-            <Option value={index} key={index}>
-              {v.name}
-            </Option>
-          ))}
-        </Select>
+          <Select
+            startDecorator={<TuneRounded />}
+            className="grow-1"
+            value={variation}
+            placeholder="Variation"
+            onChange={(_, value) => setVariation(value || 0)}
+          >
+            {variations.map((v, index) => (
+              <Option value={index} key={index}>
+                {v.name}
+              </Option>
+            ))}
+          </Select>
+        </Tooltip>
 
-        <Select
-          startDecorator={<LayersRounded />}
-          className="grow-1"
-          value={channel}
-          placeholder="Channel"
-          onChange={(_, value) => setChannel(value || 0)}
+        <Tooltip
+          arrow
+          variant="outlined"
+          title="Channel: the stage at which data was captured. e.g. different NN layers"
         >
-          {variations[variation]?.channels.map((v, index) => (
-            <Option value={index} key={index}>
-              {v.name}
-            </Option>
-          ))}
-        </Select>
+          <Select
+            startDecorator={<LayersRounded />}
+            className="grow-1"
+            value={channel}
+            placeholder="Channel"
+            onChange={(_, value) => setChannel(value || 0)}
+          >
+            {variations[variation]?.channels.map((v, index) => (
+              <Option value={index} key={index}>
+                {v.name}
+              </Option>
+            ))}
+          </Select>
+        </Tooltip>
 
         <ToggleButtonGroup
           value={renderStyle}

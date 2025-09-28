@@ -2,7 +2,7 @@ import Capture from '@/lib/capture'
 import { buildColormap } from '@/lib/colormaps'
 import GlobalController from '@/lib/global_controller'
 import { mixColors } from '@/lib/utils'
-import { Chip, Theme, Tooltip } from '@mui/joy'
+import { Chip, Tooltip } from '@mui/joy'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -32,6 +32,7 @@ export default function ClassChips({ capture, colorMap }: ClassChipsProps) {
       key={index}
       variant="plain"
       arrow
+      keepMounted
       title={
         label.image ? (
           <Image
@@ -49,12 +50,11 @@ export default function ClassChips({ capture, colorMap }: ClassChipsProps) {
       slotProps={
         {
           root: {
-            sx: (theme: Theme) => ({
+            sx: {
               backgroundColor: 'black',
               padding: 4,
-              filter: theme.palette.mode === 'dark' ? 'invert()' : '',
               opacity: label.image ? 100 : 0,
-            }),
+            },
           },
           arrow: {
             sx: {

@@ -12,6 +12,32 @@ function remap(
   return a * (x - initial_range[0]) + target_range[0]
 }
 
+function hex2rgb(hex: string, opacity: number | undefined = undefined) {
+  hex = hex.trim()
+  hex = hex[0] === '#' ? hex.substring(1) : hex
+  const bigint = parseInt(hex, 16)
+  const h = []
+  if (hex.length === 3) {
+    h.push((bigint >> 4) & 255)
+    h.push((bigint >> 2) & 255)
+  } else {
+    h.push((bigint >> 16) & 255)
+    h.push((bigint >> 8) & 255)
+  }
+  h.push(bigint & 255)
+  if (opacity !== undefined) {
+    h.push(opacity)
+    return 'rgba(' + h.join() + ')'
+  } else {
+    return 'rgb(' + h.join() + ')'
+  }
+}
+
+function bodyBg() {
+  const bodyBg = window.getComputedStyle(document.body, null).backgroundColor
+  return bodyBg[0] === '#' ? hex2rgb(bodyBg) : bodyBg
+}
+
 export default class Renderer {
   // Holds the currently chosen variation data which is asynchronously
   // loaded by AssetManager
@@ -64,7 +90,9 @@ export default class Renderer {
         this.canvas.height / window.devicePixelRatio,
       )
 
-      this.ctx.fillStyle = `rgb(255, 255, 255, ${tailFalloff}%)`
+      this.ctx.fillStyle = bodyBg()
+        .replace('rgb', 'rgba')
+        .replace(')', `,${tailFalloff}%)`)
       this.ctx.fill()
     }
 

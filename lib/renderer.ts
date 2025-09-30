@@ -96,6 +96,15 @@ export default class Renderer {
       this.ctx.fill()
     }
 
+    function getMaskedColor(mask: number, colorid: number) {
+      if (mask === undefined || mask > 0.5) return colormap[colorid]
+      else
+        return colormap[colorid].replace(
+          /(,\s*\d*%)?\)/g,
+          `,${1000 / array.shape[1]}%)`,
+        )
+    }
+
     if (!tailMode)
       for (let i = 0; i < array.shape[1]; i++) {
         const x = remap(array.at(frame, i, 0) as number, xBounds, [0, 1])
@@ -107,18 +116,7 @@ export default class Renderer {
         const colorid = classid
         const mask = GlobalController.classMask[classid]
 
-        if (mask === undefined || mask > 0.5)
-          this._drawCircle(x, y, radius, colormap[colorid])
-        else
-          this._drawCircle(
-            x,
-            y,
-            radius,
-            colormap[colorid].replace(
-              /(,\s*\d*%)?\)/g,
-              `,${1000 / array.shape[1]}%)`,
-            ),
-          )
+        this._drawCircle(x, y, radius, getMaskedColor(mask, colorid))
       }
     else
       for (let i = 0; i < array.shape[1]; i++) {
@@ -127,11 +125,14 @@ export default class Renderer {
 
         const bx = remap(array.at(frame, i, 0) as number, xBounds, [0, 1])
         const by = remap(array.at(frame, i, 1) as number, yBounds, [0, 1])
-        const colorid = this.array[this.array.length - 1].data[i] as number
+        const classid = this.array[this.array.length - 1].data[i] as number
+        const colorid = classid
+        const mask = GlobalController.classMask[classid]
 
-        this._drawLine([ax, ay], [bx, by], radius * 2, colormap[colorid])
+        const maskedColor = getMaskedColor(mask, colorid)
 
-        if (taTailMode) this._drawCircle(bx, by, radius, colormap[colorid])
+        this._drawLine([ax, ay], [bx, by], radius * 2, maskedColor)
+        if (taTailMode) this._drawCircle(bx, by, radius, maskedColor)
       }
   }
 

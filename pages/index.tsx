@@ -150,8 +150,7 @@ export default function Home() {
           // backgroundColor: theme.vars.palette.primary[200],
           // color: theme.vars.palette.primary[900]
 
-          backgroundColor:
-            theme.palette.mode == 'light' ? 'rgb(227, 239, 251)' : '#19283b',
+          backgroundColor: theme.palette.primary.plainHoverBg,
           color: theme.vars.palette.primary.softColor,
         })}
       >

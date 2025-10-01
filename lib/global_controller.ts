@@ -31,7 +31,7 @@ class _GlobalController {
   }
 
   get frameCount() {
-    return this.capture?.frameCount || 0
+    return this.capture?.frameCount ?? 0
   }
 
   tick() {

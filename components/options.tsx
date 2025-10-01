@@ -58,7 +58,7 @@ function ColormapSelect({
       // className="grow-1"
       value={colorMap}
       renderValue={(selected) => {
-        return <ColormapSelectValue v={selected?.value || ''} />
+        return <ColormapSelectValue v={selected?.value ?? ''} />
       }}
       placeholder="Color map"
       onChange={(_e: object | null, value: string | null) => {

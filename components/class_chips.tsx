@@ -14,7 +14,7 @@ interface ClassChipsProps {
 
 export default function ClassChips({ capture, colorMap }: ClassChipsProps) {
   const [classMask, setClassMask] = useState([] as number[])
-  const classes = capture.classes || []
+  const classes = capture.classes ?? []
 
   useEffect(() => {
     GlobalController.setClassMask(classMask)

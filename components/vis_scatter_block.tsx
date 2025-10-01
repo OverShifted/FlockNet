@@ -113,7 +113,7 @@ export default function VisScatterBlock({
             className="grow-1"
             value={variation}
             placeholder="Variation"
-            onChange={(_, value) => setVariation(value || 0)}
+            onChange={(_, value) => setVariation(value ?? 0)}
           >
             {variations.map((v, index) => (
               <Option value={index} key={index}>
@@ -133,7 +133,7 @@ export default function VisScatterBlock({
             className="grow-1"
             value={channel}
             placeholder="Channel"
-            onChange={(_, value) => setChannel(value || 0)}
+            onChange={(_, value) => setChannel(value ?? 0)}
           >
             {variations[variation]?.channels.map((v, index) => (
               <Option value={index} key={index}>
@@ -145,7 +145,7 @@ export default function VisScatterBlock({
 
         <ToggleButtonGroup
           value={renderStyle}
-          onChange={(_, value) => setRenderStyle(value || 'dots')}
+          onChange={(_, value) => setRenderStyle(value ?? 'dots')}
           aria-label="Render style"
         >
           <Tooltip arrow variant="outlined" title="Dots">

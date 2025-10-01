@@ -19329,12 +19329,11 @@ function buildColormap(name: string) {
 const colorMapData = data
 const colorMapKeys = colorMapData
   .keys()
-  .filter((key) => (colorMapData.get(key)?.colors.length || 0) >= 10)
+  .filter((key) => (colorMapData.get(key)?.colors.length ?? 0) >= 10)
   .filter((key) => {
     const colors = colorMapData.get(key)?.colors
 
     if (['tab20', 'tab20b', 'tab20c'].includes(key)) return false
-
     if (!colors) return false
 
     for (const color of colors) {

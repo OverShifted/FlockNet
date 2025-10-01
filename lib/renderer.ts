@@ -110,7 +110,7 @@ export default class Renderer {
         const x = remap(array.at(frame, i, 0) as number, xBounds, [0, 1])
         const y = remap(array.at(frame, i, 1) as number, yBounds, [0, 1])
 
-        // const classCount = GlobalController.capture?.classes?.length || 10
+        // const classCount = GlobalController.capture?.classes?.length ?? 10
         const classid = this.array[this.array.length - 1].data[i] as number
         // const colorid = classid * 9 / (classCount - 1)
         const colorid = classid

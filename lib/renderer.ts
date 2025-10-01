@@ -83,12 +83,7 @@ export default class Renderer {
 
     if (tailMode && isPlaying) {
       this.ctx.beginPath()
-      this.ctx.rect(
-        0,
-        0,
-        this.canvas.width / window.devicePixelRatio,
-        this.canvas.height / window.devicePixelRatio,
-      )
+      this.ctx.rect(0, 0, this.canvas.width, this.canvas.height)
 
       this.ctx.fillStyle = bodyBg()
         .replace('rgb', 'rgba')
@@ -137,20 +132,15 @@ export default class Renderer {
   }
 
   clear() {
-    this.ctx.clearRect(
-      0,
-      0,
-      this.canvas.width / window.devicePixelRatio,
-      this.canvas.height / window.devicePixelRatio,
-    )
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
   }
 
   _drawCircle(centerX: number, centerY: number, radius: number, color: string) {
     this.ctx.beginPath()
     this.ctx.arc(
-      Math.floor((centerX * this.canvas.width) / window.devicePixelRatio),
-      Math.floor((centerY * this.canvas.height) / window.devicePixelRatio),
-      radius,
+      centerX * this.canvas.width,
+      centerY * this.canvas.height,
+      (radius * this.canvas.width) / 512,
       0,
       2 * Math.PI,
       false,
@@ -166,24 +156,16 @@ export default class Renderer {
     color: string,
   ) {
     this.ctx.beginPath()
-    this.ctx.moveTo(
-      Math.floor((a[0] * this.canvas.width) / window.devicePixelRatio),
-      Math.floor((a[1] * this.canvas.height) / window.devicePixelRatio),
-    )
-    this.ctx.lineTo(
-      Math.floor((b[0] * this.canvas.width) / window.devicePixelRatio),
-      Math.floor((b[1] * this.canvas.height) / window.devicePixelRatio),
-    )
+    this.ctx.moveTo(a[0] * this.canvas.width, a[1] * this.canvas.height)
+    this.ctx.lineTo(b[0] * this.canvas.width, b[1] * this.canvas.height)
     this.ctx.strokeStyle = color
-    this.ctx.lineWidth = width
+    this.ctx.lineWidth = (width * this.canvas.width) / 512
     this.ctx.stroke()
   }
 
   correctScaling() {
-    this.canvas.width = 512 * window.devicePixelRatio
-    this.canvas.height = 512 * window.devicePixelRatio
-
-    this.ctx.resetTransform()
-    this.ctx.scale(window.devicePixelRatio, window.devicePixelRatio)
+    const ratio = window.devicePixelRatio * (window.visualViewport?.scale ?? 1)
+    this.canvas.width = this.canvas.clientWidth * ratio
+    this.canvas.height = this.canvas.clientWidth * ratio
   }
 }

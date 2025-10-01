@@ -46,14 +46,15 @@ class _GlobalController {
     this.time = time
     this.reactSetTime?.(time)
 
-    if (!this.isPlaying) {
-      this.items.forEach((item) => item.draw())
-    }
+    if (!this.isPlaying) this.items.forEach((item) => item.draw())
   }
 
   setIsPlaying(isPlaying: boolean) {
     this.isPlaying = isPlaying
     this.reactSetIsPlaying?.(isPlaying)
+
+    // Make sure we render the frame that we settle on
+    if (!isPlaying) this.items.forEach((item) => item.draw())
   }
 
   setClassMask(classMask: number[]) {
@@ -97,6 +98,10 @@ if (typeof window !== 'undefined') {
   requestAnimationFrame(tick)
 
   window.addEventListener('resize', () => {
+    GlobalController.correctScaling()
+  })
+
+  window.visualViewport?.addEventListener('resize', () => {
     GlobalController.correctScaling()
   })
 }

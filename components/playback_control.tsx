@@ -3,7 +3,7 @@ import PauseRoundedIcon from '@mui/icons-material/PauseRounded'
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded'
 import { Slider, useColorScheme } from '@mui/joy'
 import { Button } from '@mui/joy'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface PlaybackControlProps {
   maxFrame: number
@@ -22,6 +22,15 @@ export default function PlaybackControl({ maxFrame }: PlaybackControlProps) {
   }
 
   const { mode } = useColorScheme()
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) {
+    return null
+  }
 
   return (
     <div id="playback-control">
@@ -49,14 +58,14 @@ export default function PlaybackControl({ maxFrame }: PlaybackControlProps) {
           }}
           min={1}
           max={maxFrame}
-          sx={{
+          sx={isMounted ? {
             '--Slider-railBackground': mode == 'light' ? '#fff' : '#111',
 
             '&:hover': {
               '--Slider-railBackground':
                 mode == 'light' ? '#f7f7f7' : '#171717',
             },
-          }}
+          } : {}}
         />
 
         <span className="absolute -bottom-0.5 left-0.5">

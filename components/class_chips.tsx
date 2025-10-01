@@ -26,10 +26,19 @@ export default function ClassChips({ capture, colorMap }: ClassChipsProps) {
 
   const router = useRouter()
   const { mode } = useColorScheme()
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) {
+    return null
+  }
 
   return classes.map((label, index) => {
     const color = buildColormap(colorMap)[index]
-    const light = mode == 'light'
+    const light = isMounted || mode == 'light'
 
     const bg = light ? 'white' : 'black'
     const fg = light ? 'black' : 'white'

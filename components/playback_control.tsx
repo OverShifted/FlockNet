@@ -1,7 +1,7 @@
 import GlobalController from '@/lib/global_controller'
 import PauseRoundedIcon from '@mui/icons-material/PauseRounded'
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded'
-import { Slider } from '@mui/joy'
+import { Slider, useColorScheme } from '@mui/joy'
 import { Button } from '@mui/joy'
 import { useState } from 'react'
 
@@ -20,6 +20,8 @@ export default function PlaybackControl({ maxFrame }: PlaybackControlProps) {
     width: '100%',
     height: '100%',
   }
+
+  const { mode } = useColorScheme()
 
   return (
     <div id="playback-control">
@@ -47,16 +49,13 @@ export default function PlaybackControl({ maxFrame }: PlaybackControlProps) {
           }}
           min={1}
           max={maxFrame}
-          sx={(theme) => {
-            const light = theme.palette.mode == 'light'
+          sx={{
+            '--Slider-railBackground': mode == 'light' ? '#fff' : '#111',
 
-            return {
-              '--Slider-railBackground': light ? '#fff' : '#111',
-
-              '&:hover': {
-                '--Slider-railBackground': light ? '#f7f7f7' : '#171717',
-              },
-            }
+            '&:hover': {
+              '--Slider-railBackground':
+                mode == 'light' ? '#f7f7f7' : '#171717',
+            },
           }}
         />
 

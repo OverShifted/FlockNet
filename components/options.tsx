@@ -1,9 +1,13 @@
 import Capture from '@/lib/capture'
 import { evaluateColorMap } from '@/lib/colormaps'
 import config from '@/lib/config'
-import { linspace, mixColors } from '@/lib/utils'
-import { PaletteRounded } from '@mui/icons-material'
-import { Box, Divider, FormLabel, Input, Option, Select } from '@mui/joy'
+import { linspace } from '@/lib/utils'
+import {
+  CastForEducationRounded,
+  NumbersRounded,
+  PaletteRounded,
+} from '@mui/icons-material'
+import { Box, Input, Option, Select, Tooltip } from '@mui/joy'
 
 function ColormapSelectValue({ v }: { v: string }) {
   return (
@@ -22,19 +26,13 @@ function ColormapSelectValue({ v }: { v: string }) {
           return (
             <Box
               key={i}
-              sx={(theme) => {
-                const light = theme.palette.mode == 'light'
-                const fg = light ? 'black' : 'white'
-                return {
-                  width: 20,
-                  height: 20,
-                  borderRadius: config.SQUARE_COLORMAP_PREVIEWS ? 0 : 10,
-                  flexShrink: 0,
-                  backgroundColor: color,
-                  borderColor: mixColors(color, fg, 0.3),
-                  marginY: 'auto',
-                  // borderWidth: config.SQUARE_COLORMAP_PREVIEWS ? 0 : 2
-                }
+              sx={{
+                width: 20,
+                height: 20,
+                borderRadius: config.SQUARE_COLORMAP_PREVIEWS ? 0 : 10,
+                flexShrink: 0,
+                backgroundColor: color,
+                marginY: 'auto',
               }}
             />
           )
@@ -103,41 +101,55 @@ function Options({
   setColorMap,
 }: OptionsProps) {
   return (
-    <Box className="w-full flex gap-4 px-5 pt-7 justify-center items-center">
-      <FormLabel>Figures</FormLabel>
-      <Input
-        type="number"
-        value={Math.max(plotCount, 1)}
-        onChange={(e) => setPlotCount(parseInt(e.target.value) || plotCount)}
-        sx={{ width: 80, textAlign: 'center' }}
-        slotProps={{ input: { min: 0 } }}
-        variant="plain"
-      />
+    <Box className="flex gap-2 flex-col sm:flex-row">
+      <Box className="my-auto">
+        <Tooltip title="Capture" arrow variant="outlined">
+          <Select
+            value={captureIdx}
+            onChange={(_e, idx: number | null) => {
+              setCaptureIdx(idx as number)
+            }}
+            // variant="plain"
+            startDecorator={<CastForEducationRounded />}
+          >
+            {captures.map((cap, idx) => (
+              <Option key={idx} value={idx}>
+                {cap.name}
+              </Option>
+            ))}
+          </Select>
+        </Tooltip>
+      </Box>
 
-      <Divider orientation="vertical" />
+      <Box className="my-auto">
+        <Tooltip title="# of visualizations" arrow variant="outlined">
+          <Input
+            type="number"
+            value={Math.max(plotCount, 1)}
+            onChange={(e) =>
+              setPlotCount(parseInt(e.target.value) || plotCount)
+            }
+            sx={{ textAlign: 'center' }}
+            className="sm:w-30"
+            slotProps={{ input: { min: 0 } }}
+            // variant="plain"
+            startDecorator={<NumbersRounded />}
+          />
+        </Tooltip>
+      </Box>
 
-      <FormLabel>Capture</FormLabel>
-      <Select
-        value={captureIdx}
-        onChange={(_e, idx: number | null) => {
-          setCaptureIdx(idx as number)
-        }}
-        variant="plain"
-      >
-        {captures.map((cap, idx) => (
-          <Option key={idx} value={idx}>
-            {cap.name}
-          </Option>
-        ))}
-      </Select>
-
-      <Divider orientation="vertical" />
-      <FormLabel>Colormap</FormLabel>
-      <ColormapSelect
-        colorMaps={colorMaps}
-        colorMap={colorMap}
-        setColorMap={setColorMap}
-      />
+      <Box className="my-auto">
+        <Tooltip title="Colormap" arrow variant="outlined">
+          {/* FIXME: For some reason a div wrapper is required for the tooltip to show up */}
+          <div>
+            <ColormapSelect
+              colorMaps={colorMaps}
+              colorMap={colorMap}
+              setColorMap={setColorMap}
+            />
+          </div>
+        </Tooltip>
+      </Box>
     </Box>
   )
 }

@@ -38,7 +38,7 @@ export default function ClassChips({ capture, colorMap }: ClassChipsProps) {
 
   return classes.map((label, index) => {
     const color = buildColormap(colorMap)[index]
-    const light = isMounted || mode == 'light'
+    const light = !isMounted || mode == 'light'
 
     const bg = light ? 'white' : 'black'
     const fg = light ? 'black' : 'white'

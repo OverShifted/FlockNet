@@ -4,6 +4,8 @@ import Visualization from './visualization'
 class _GlobalController {
   items: Map<string, Visualization>
 
+  fps: number = 30
+  timeDeltaLastTick: number = 0
   time: number = 0
   reactSetTime: ((time: number) => void) | null = null
 
@@ -34,10 +36,14 @@ class _GlobalController {
     return this.capture?.frameCount ?? 0
   }
 
-  tick() {
+  tick(deltaTime: number) {
     if (this.isPlaying && this.frameCount) {
       this.items.forEach((item) => item.draw())
-      this.setTime(this.time + 1)
+      this.timeDeltaLastTick = this.fps * deltaTime
+      this.timeDeltaLastTick = Number.isNaN(this.timeDeltaLastTick)
+        ? 0
+        : this.timeDeltaLastTick
+      this.setTime(this.time + this.timeDeltaLastTick)
     }
   }
 
@@ -73,24 +79,14 @@ class _GlobalController {
 const GlobalController = new _GlobalController()
 export default GlobalController
 
-// let then = Date.now()
-// const fpses: number[] = []
+let then = Date.now()
 
 function tick() {
-  // const now = Date.now()
-  // const deltaTime = now - then
-  // const fps = 1000/deltaTime
+  const now = Date.now()
+  const deltaTime = now - then
+  then = now
 
-  // if (fpses.length < 100)
-  //     fpses.push(fps)
-  // else {
-  //     console.log(fpses.reduce((a, b) => a + b) / fpses.length)
-  //     fpses.length = 0
-  // }
-
-  GlobalController.tick()
-
-  // then = now
+  GlobalController.tick(deltaTime * 0.001)
   requestAnimationFrame(tick)
 }
 

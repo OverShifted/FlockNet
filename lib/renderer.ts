@@ -100,35 +100,35 @@ export default class Renderer {
         )
     }
 
-    if (!tailMode)
-      for (let i = 0; i < array.shape[1]; i++) {
-        const x = remap(array.at(frame, i, 0) as number, xBounds, [0, 1])
-        const y = remap(array.at(frame, i, 1) as number, yBounds, [0, 1])
+    function arrayAt(frame: number, x: number, y: number) {
+      const lastFrame = Math.floor(frame)
+      const t = frame - lastFrame
+      const a = array.at(lastFrame, x, y) as number
+      const b = array.at(lastFrame + 1, x, y) as number
 
-        // const classCount = GlobalController.capture?.classes?.length ?? 10
-        const classid = this.array[this.array.length - 1].data[i] as number
-        // const colorid = classid * 9 / (classCount - 1)
-        const colorid = classid
-        const mask = GlobalController.classMask[classid]
+      return a * (1 - t) + b * t
+    }
 
-        this._drawCircle(x, y, radius, getMaskedColor(mask, colorid))
+    for (let i = 0; i < array.shape[1]; i++) {
+      const x = remap(arrayAt(frame, i, 0) as number, xBounds, [0, 1])
+      const y = remap(arrayAt(frame, i, 1) as number, yBounds, [0, 1])
+
+      const classid = this.array[this.array.length - 1].data[i] as number
+      const colorid = classid
+      const mask = GlobalController.classMask[classid]
+      const maskedColor = getMaskedColor(mask, colorid)
+
+      if (tailMode) {
+        const lastFrame = frame - GlobalController.timeDeltaLastTick
+        const ax = remap(arrayAt(lastFrame, i, 0) as number, xBounds, [0, 1])
+        const ay = remap(arrayAt(lastFrame, i, 1) as number, yBounds, [0, 1])
+
+        this._drawLine([ax, ay], [x, y], radius * 2, maskedColor)
+        if (taTailMode) this._drawCircle(x, y, radius, maskedColor)
+      } else {
+        this._drawCircle(x, y, radius, maskedColor)
       }
-    else
-      for (let i = 0; i < array.shape[1]; i++) {
-        const ax = remap(array.at(frame - 1, i, 0) as number, xBounds, [0, 1])
-        const ay = remap(array.at(frame - 1, i, 1) as number, yBounds, [0, 1])
-
-        const bx = remap(array.at(frame, i, 0) as number, xBounds, [0, 1])
-        const by = remap(array.at(frame, i, 1) as number, yBounds, [0, 1])
-        const classid = this.array[this.array.length - 1].data[i] as number
-        const colorid = classid
-        const mask = GlobalController.classMask[classid]
-
-        const maskedColor = getMaskedColor(mask, colorid)
-
-        this._drawLine([ax, ay], [bx, by], radius * 2, maskedColor)
-        if (taTailMode) this._drawCircle(bx, by, radius, maskedColor)
-      }
+    }
   }
 
   clear() {

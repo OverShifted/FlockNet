@@ -147,6 +147,7 @@ export default function VisScatterBlock({
           value={renderStyle}
           onChange={(_, value) => setRenderStyle(value ?? 'dots')}
           aria-label="Render style"
+          size="sm"
         >
           <Tooltip arrow variant="outlined" title="Dots">
             <Button value="dots">
@@ -167,6 +168,7 @@ export default function VisScatterBlock({
           arrow
           placement="bottom-end"
           variant="outlined"
+          disableFocusListener
           title={
             <div className="w-80 pl-2.5 pr-4">
               <div className="flex items-center justify-evenly -mb-3">
@@ -211,7 +213,7 @@ export default function VisScatterBlock({
             </div>
           }
         >
-          <Button sx={{ padding: 1 }}>
+          <Button sx={{ padding: 1 }} size="sm">
             <SettingsRounded />
           </Button>
         </Tooltip>

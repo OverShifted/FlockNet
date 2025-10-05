@@ -111,7 +111,7 @@ function ThemeToggleButton() {
 
 function Home() {
   // State for selected capture
-  const [captureIdx, setCaptureIdx] = useState(0)
+  const [captureIdx, setCaptureIdx] = useState(2)
   const capture = captures[captureIdx]
 
   // TODO: Expensive state to handle!

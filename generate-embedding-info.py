@@ -24,6 +24,7 @@ for embedding in sorted(embeddings.iterdir()):
 			metadata = json.load(metadata_file.open())
 			ts_metadata = {
 				'name': metadata.get('name'),
+				'path': str(embedding.relative_to('.')),
 				'frameCount': metadata.get('frameCount'),
 				'classes': [gen_class(webapp_root, name, image) for name, image in metadata.get('classes', [])],
 

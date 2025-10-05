@@ -3,13 +3,14 @@ import { evaluateColorMap } from '@/lib/colormaps'
 import config from '@/lib/config'
 import { linspace } from '@/lib/utils'
 import {
+  CallMadeRounded,
   CastForEducationRounded,
   NumbersRounded,
   PaletteRounded,
 } from '@mui/icons-material'
-import { Box, Input, Option, Select, Tooltip } from '@mui/joy'
+import { Box, Chip, Input, Link, Option, Select, Tooltip } from '@mui/joy'
 
-function ColormapSelectValue({ v }: { v: string }) {
+function ColormapOption({ v }: { v: string }) {
   return (
     <Box className="flex gap-5 justify-between w-full">
       {v}
@@ -58,7 +59,7 @@ function ColormapSelect({
       // className="grow-1"
       value={colorMap}
       renderValue={(selected) => {
-        return <ColormapSelectValue v={selected?.value ?? ''} />
+        return <ColormapOption v={selected?.value ?? ''} />
       }}
       placeholder="Color map"
       onChange={(_e: object | null, value: string | null) => {
@@ -70,7 +71,7 @@ function ColormapSelect({
     >
       {colorMaps.map((v) => (
         <Option key={v} value={v}>
-          <ColormapSelectValue v={v} />
+          <ColormapOption v={v} />
         </Option>
       ))}
     </Select>
@@ -111,10 +112,40 @@ function Options({
             }}
             // variant="plain"
             startDecorator={<CastForEducationRounded />}
+            renderValue={(value) => (
+              <Box>{captures[value?.value ?? 0].name}</Box>
+            )}
           >
             {captures.map((cap, idx) => (
               <Option key={idx} value={idx}>
-                {cap.name}
+                <Box className="flex justify-between w-full gap-5">
+                  <Box className="flex gap-2">
+                    {cap.name}
+                    <Chip variant="outlined">
+                      {cap.classes?.length} classes
+                    </Chip>
+                  </Box>
+
+                  <Box className="flex gap-3">
+                    <Link
+                      level="body-xs"
+                      href={
+                        'https://github.com/OverShifted/nnvis/tree/master/' +
+                        cap.path
+                      }
+                      endDecorator={<CallMadeRounded />}
+                      slotProps={{
+                        endDecorator: {
+                          sx: {
+                            marginX: 0,
+                          },
+                        },
+                      }}
+                    >
+                      Data
+                    </Link>
+                  </Box>
+                </Box>
               </Option>
             ))}
           </Select>
@@ -127,7 +158,7 @@ function Options({
             type="number"
             value={Math.max(plotCount, 1)}
             onChange={(e) =>
-              setPlotCount(parseInt(e.target.value) || plotCount)
+              setPlotCount(parseInt(e.target.value) ?? plotCount)
             }
             sx={{ textAlign: 'center' }}
             className="sm:w-30"

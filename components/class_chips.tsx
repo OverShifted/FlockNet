@@ -36,7 +36,7 @@ export default function ClassChips({ capture, colorMap }: ClassChipsProps) {
     return null
   }
 
-  return classes.map((label, index) => {
+  return classes.map((clazz, index) => {
     const color = buildColormap(colorMap)[index]
     const light = !isMounted || mode == 'light'
 
@@ -53,7 +53,7 @@ export default function ClassChips({ capture, colorMap }: ClassChipsProps) {
         arrow
         keepMounted
         title={
-          label.image ? (
+          clazz.image ? (
             <Image
               loading="eager"
               style={{
@@ -61,8 +61,8 @@ export default function ClassChips({ capture, colorMap }: ClassChipsProps) {
               }}
               width={120}
               height={120}
-              src={router.basePath + label.image}
-              alt={`Preview of ${label.name}`}
+              src={router.basePath + clazz.image}
+              alt={`Preview of ${clazz.name}`}
             />
           ) : null
         }
@@ -73,7 +73,7 @@ export default function ClassChips({ capture, colorMap }: ClassChipsProps) {
               sx: {
                 backgroundColor: 'black',
                 padding: 4,
-                opacity: label.image ? 100 : 0,
+                opacity: clazz.image ? 100 : 0,
               },
             },
             arrow: {
@@ -108,7 +108,7 @@ export default function ClassChips({ capture, colorMap }: ClassChipsProps) {
               opacity: classMask[index] ? '100%' : '40%',
             }}
           >
-            {label.name}
+            {clazz.name}
           </Chip>
         </div>
       </Tooltip>

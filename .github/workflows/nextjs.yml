@@ -53,6 +53,8 @@ jobs:
         with:
           node-version: "24.4.1"
           cache: ${{ steps.detect-package-manager.outputs.manager }}
+      - name: Generate Embedding Info
+        run: python3 generate-embedding-info.py
       - name: Setup Pages
         uses: actions/configure-pages@v5
         with:

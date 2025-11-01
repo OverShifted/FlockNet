@@ -51,7 +51,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '24.4.1'
+          node-version: '24.9.0'
           cache: ${{ steps.detect-package-manager.outputs.manager }}
       - name: Generate Embedding Info
         run: python3 generate-embedding-info.py

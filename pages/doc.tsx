@@ -32,7 +32,6 @@ function Page() {
       </Head>
       <div className={`${styles.markdownRoot} ${spaceGrotesk.className}`}>
         <div>
-          {/* @ts-expect-error: Ignore type-checking passed props */}
           <Doc classes={styles} capture={captures[5]} monoFont={geistMono} />
         </div>
       </div>

@@ -1,10 +1,9 @@
-import GlobalController from '@/lib/global_controller'
+import { globalController } from '@/lib/controller'
 import { SpeedRounded } from '@mui/icons-material'
-import PauseRoundedIcon from '@mui/icons-material/PauseRounded'
-import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded'
 import { Input, Slider, Tooltip, useColorScheme } from '@mui/joy'
 import { Button } from '@mui/joy'
 import { useEffect, useState } from 'react'
+import PlayPauseIcon from './play_pause_icon'
 
 interface PlaybackControlProps {
   maxFrame: number
@@ -15,13 +14,10 @@ export default function PlaybackControl({ maxFrame }: PlaybackControlProps) {
   const [time, setTime] = useState(0)
   const [fps, setFPS] = useState(30)
 
-  GlobalController.reactSetTime = setTime
-  GlobalController.reactSetIsPlaying = setIsPlaying
-
-  const playPauseIconSx = {
-    width: '100%',
-    height: '100%',
-  }
+  useEffect(() => {
+    globalController.reactSetTime = setTime
+    globalController.reactSetIsPlaying = setIsPlaying
+  }, [])
 
   const { mode } = useColorScheme()
   const [isMounted, setIsMounted] = useState(false)
@@ -35,17 +31,13 @@ export default function PlaybackControl({ maxFrame }: PlaybackControlProps) {
   }
 
   return (
-    <div id="playback-control">
+    <div className="flex items-center gap-5 px-2 pt-2 pb-7">
       <Button
-        id="play-button"
-        onClick={() => GlobalController.setIsPlaying(!isPlaying)}
+        className="inline-flex w-12 min-w-12 h-12 p-3! rounded-full!"
+        onClick={() => globalController.setIsPlaying(!isPlaying)}
       >
         <span className="flex justify-center items-center">
-          {isPlaying ? (
-            <PauseRoundedIcon sx={playPauseIconSx} />
-          ) : (
-            <PlayArrowRoundedIcon sx={playPauseIconSx} />
-          )}
+          <PlayPauseIcon isPlaying={isPlaying} />
         </span>
       </Button>
       <div style={{ width: '100%', position: 'relative' }}>
@@ -53,8 +45,8 @@ export default function PlaybackControl({ maxFrame }: PlaybackControlProps) {
           aria-label="Frame"
           value={time + 1}
           onChange={(e) => {
-            GlobalController.setIsPlaying(false)
-            GlobalController.setTime(
+            globalController.setIsPlaying(false)
+            globalController.setTime(
               parseInt((e.target as HTMLInputElement).value) - 1,
             )
           }}
@@ -86,7 +78,7 @@ export default function PlaybackControl({ maxFrame }: PlaybackControlProps) {
           value={fps}
           onChange={(e) => {
             setFPS(parseInt(e.target.value) ?? fps)
-            GlobalController.fps = parseInt(e.target.value) ?? fps
+            globalController.fps = parseInt(e.target.value) ?? fps
           }}
           // sx={{ textAlign: 'center' }}
           className="w-42"

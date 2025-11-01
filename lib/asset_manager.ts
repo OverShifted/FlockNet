@@ -3,10 +3,10 @@ import Variation from './variation'
 
 type Wish = {
   makerId: string
-  resolve: (value: NDArray[] | PromiseLike<NDArray[]>) => void
+  resolve: (_value: NDArray[] | PromiseLike<NDArray[]>) => void
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  reject: (reason?: any) => void
-  onProgress: (percentage: number) => void
+  reject: (_reason?: any) => void
+  onProgress: (_percentage: number) => void
 }
 
 class Pending {
@@ -55,7 +55,7 @@ class _AssetManager {
     variation: Variation,
     basePath: string,
     onLongLoadRequired: () => void,
-    onProgress: (percentage: number) => void,
+    onProgress: (_percentage: number) => void,
   ): Promise<NDArray[]> {
     this.revokePendingRequests(requesterId)
     const url = basePath + variation.path

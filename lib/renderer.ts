@@ -1,4 +1,4 @@
-import GlobalController from './global_controller'
+import { Controller } from './controller'
 import { NDArray } from './numpy_loader'
 import Variation from './variation'
 
@@ -45,16 +45,19 @@ export default class Renderer {
   variation: Variation
   canvas: HTMLCanvasElement
   ctx: CanvasRenderingContext2D
+  controller: Controller
 
   constructor(
     array: NDArray[],
     variation: Variation,
     canvas: HTMLCanvasElement,
+    controller: Controller,
   ) {
     this.array = array
     this.variation = variation
     this.canvas = canvas
     this.ctx = canvas.getContext('2d') as CanvasRenderingContext2D
+    this.controller = controller
 
     this.correctScaling()
   }
@@ -73,7 +76,6 @@ export default class Renderer {
     taTailMode: boolean,
     tailFalloff: number,
     isPlaying: boolean,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _fraction: number,
   ) {
     if (!(tailMode && frame != 0)) this.clear()
@@ -115,11 +117,11 @@ export default class Renderer {
 
       const classid = this.array[this.array.length - 1].data[i] as number
       const colorid = classid
-      const mask = GlobalController.classMask[classid]
+      const mask = this.controller.classMask[classid]
       const maskedColor = getMaskedColor(mask, colorid)
 
       if (tailMode) {
-        const lastFrame = frame - GlobalController.timeDeltaLastTick
+        const lastFrame = frame - this.controller.timeDeltaLastTick
         const ax = remap(arrayAt(lastFrame, i, 0) as number, xBounds, [0, 1])
         const ay = remap(arrayAt(lastFrame, i, 1) as number, yBounds, [0, 1])
 

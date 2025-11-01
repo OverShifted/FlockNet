@@ -46,7 +46,7 @@ function ColormapOption({ v }: { v: string }) {
 interface ColormapSelectProps {
   colorMaps: string[]
   colorMap: string
-  setColorMap: (v: string) => void
+  setColorMap: (_v: string) => void
 }
 
 function ColormapSelect({
@@ -80,15 +80,15 @@ function ColormapSelect({
 
 interface OptionsProps {
   plotCount: number
-  setPlotCount: (v: number) => void
+  setPlotCount: (_v: number) => void
 
   captures: Capture[]
   captureIdx: number
-  setCaptureIdx: (v: number) => void
+  setCaptureIdx: (_v: number) => void
 
   colorMaps: string[]
   colorMap: string
-  setColorMap: (v: string) => void
+  setColorMap: (_v: string) => void
 }
 
 function Options({

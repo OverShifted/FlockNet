@@ -1,6 +1,9 @@
 import Capture from '@/lib/capture'
 import { buildColormap } from '@/lib/colormaps'
-import GlobalController from '@/lib/global_controller'
+
+// For now, this component is only used in the playground
+// So it's fine to hard-code the global controller instance
+import { globalController } from '@/lib/controller'
 import { mixColors } from '@/lib/utils'
 import { Chip, Tooltip, useColorScheme } from '@mui/joy'
 import Image from 'next/image'
@@ -13,16 +16,14 @@ interface ClassChipsProps {
 }
 
 export default function ClassChips({ capture, colorMap }: ClassChipsProps) {
-  const [classMask, setClassMask] = useState([] as number[])
   const classes = capture.classes ?? []
+  const [classMask, setClassMask] = useState(
+    new Array(classes.length).fill(1) as number[],
+  )
 
   useEffect(() => {
-    GlobalController.setClassMask(classMask)
+    globalController.setClassMask(classMask)
   }, [classMask])
-
-  useEffect(() => {
-    setClassMask(new Array(classes.length).fill(1))
-  }, [capture, classes.length])
 
   const router = useRouter()
   const { mode } = useColorScheme()

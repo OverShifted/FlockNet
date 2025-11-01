@@ -1,23 +1,32 @@
 import Capture from './capture'
 import Visualization from './visualization'
 
-class _GlobalController {
+// Manages the playback of a group of Visualization instances
+class Controller {
+  static instances: Controller[] = []
+
   items: Map<string, Visualization>
 
   fps: number = 30
   timeDeltaLastTick: number = 0
   time: number = 0
-  reactSetTime: ((time: number) => void) | null = null
+  reactSetTime: ((_time: number) => void) | null = null
 
   capture: Capture | null = null
 
   isPlaying: boolean = true
-  reactSetIsPlaying: ((isPlaying: boolean) => void) | null = null
+  reactSetIsPlaying: ((_isPlaying: boolean) => void) | null = null
 
   classMask: number[] = []
 
   constructor() {
+    Controller.instances.push(this)
     this.items = new Map()
+  }
+
+  static removeInstance(instance: Controller) {
+    const index = Controller.instances.indexOf(instance)
+    if (index > -1) Controller.instances.splice(index, 1)
   }
 
   register(id: string, visualization: Visualization) {
@@ -76,8 +85,9 @@ class _GlobalController {
   }
 }
 
-const GlobalController = new _GlobalController()
-export default GlobalController
+// The default instance used in the "playground"
+const globalController = new Controller()
+export { Controller, globalController }
 
 let then = Date.now()
 
@@ -86,18 +96,16 @@ function tick() {
   const deltaTime = now - then
   then = now
 
-  GlobalController.tick(deltaTime * 0.001)
+  // console.log(Controller.instances)
+  Controller.instances.map((c) => c.tick(deltaTime * 0.001))
   requestAnimationFrame(tick)
 }
 
 if (typeof window !== 'undefined') {
   requestAnimationFrame(tick)
 
-  window.addEventListener('resize', () => {
-    GlobalController.correctScaling()
-  })
-
-  window.visualViewport?.addEventListener('resize', () => {
-    GlobalController.correctScaling()
-  })
+  const correctScaling = () =>
+    Controller.instances.map((c) => c.correctScaling())
+  window.addEventListener('resize', correctScaling)
+  window.visualViewport?.addEventListener('resize', correctScaling)
 }

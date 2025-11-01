@@ -1,5 +1,5 @@
 import AssetManager from './asset_manager'
-import GlobalController from './global_controller'
+import { Controller } from './controller'
 import { NDArray } from './numpy_loader'
 import Renderer from './renderer'
 import Variation from './variation'
@@ -11,9 +11,10 @@ export default class Visualization {
   variation: Variation | null = null
   canvas: HTMLCanvasElement
   renderer: Renderer | null = null
+  controller: Controller
 
-  reactSetIsLoading: (isLoading: boolean) => void
-  reactSetLoadPercentage: (percentage: number) => void
+  reactSetIsLoading: (_isLoading: boolean) => void
+  reactSetLoadPercentage: (_percentage: number) => void
 
   channel: number
   colorMap: string[]
@@ -28,8 +29,9 @@ export default class Visualization {
   constructor(
     id: string,
     canvas: HTMLCanvasElement,
-    reactSetIsLoading: (isLoading: boolean) => void,
-    reactSetLoadPercentage: (percentage: number) => void,
+    controller: Controller,
+    reactSetIsLoading: (_isLoading: boolean) => void,
+    reactSetLoadPercentage: (_percentage: number) => void,
     options: {
       channel: number
       colorMap: string[]
@@ -42,6 +44,7 @@ export default class Visualization {
   ) {
     this.id = id
     this.canvas = canvas
+    this.controller = controller
 
     this.reactSetIsLoading = reactSetIsLoading
     this.reactSetLoadPercentage = reactSetLoadPercentage
@@ -59,7 +62,7 @@ export default class Visualization {
   }
 
   _setArray(array: NDArray[], variation: Variation) {
-    this.renderer = new Renderer(array, variation, this.canvas)
+    this.renderer = new Renderer(array, variation, this.canvas, this.controller)
     this.draw()
   }
 
@@ -129,7 +132,7 @@ export default class Visualization {
     )
   }
 
-  draw(time: number = GlobalController.time) {
+  draw(time: number = this.controller.time) {
     this.renderer?.render(
       time,
       this.channel,
@@ -138,7 +141,7 @@ export default class Visualization {
       this.renderStyle.endsWith('tail'),
       this.renderStyle == 'lines-tail',
       this.tailFalloff,
-      GlobalController.isPlaying,
+      this.controller.isPlaying,
       this.fraction,
     )
   }

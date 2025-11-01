@@ -1,26 +1,6 @@
 @import 'tailwindcss';
 
-#playback-control {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 8px 8px 30px 8px;
-}
-
-#play-button {
-  display: inline-flex;
-  width: 50px;
-  min-width: 50px;
-  height: 50px;
-  padding: 10px;
-  border-radius: 100%;
-  cursor: pointer;
-}
-
 canvas {
-  display: block;
-  border-width: 1px;
-  border-style: solid;
   border-color: var(
     --variant-outlinedBorder,
     var(
@@ -32,11 +12,4 @@ canvas {
     var(--joy-shadowRing, 0 0 #000),
     0px 1px 2px 0px
       rgba(var(--joy-shadowChannel, 21 21 21) / var(--joy-shadowOpacity, 0.08));
-  border-radius: 6px;
-
-  /* width: 512px;
-  height: 512px; */
-  margin: 0 8px;
-  max-width: 512px;
-  width: calc(100% - 16px);
 }

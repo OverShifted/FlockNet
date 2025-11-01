@@ -1,0 +1,81 @@
+import VisScatterBlock from './vis_scatter_block'
+import { Controller } from '@/lib/controller'
+import { RefObject, useRef, useState, useEffect } from 'react'
+
+<header>
+  {/* # Making of {<div className={props.classes.titleBlock}><Scatter capture={props.capture} /></div>}FlockNet */}
+  # Making of FlockNet
+  <span className={props.classes.date}>29 Oct 2025</span>
+</header>
+
+When it comes to training neural networks, it is usually the underlying
+mathematics that gets the most attention. However, to gain a high-level
+intuition of it's process, maybe we should take a step back and focus on
+more visual and intuitive _things_.
+
+Now tidy up for the journey of exploring the dark techniques of exactly
+doing that. This interactive article assumes you have a good understanding
+of a neural network's architecture
+
+First, we need a way of _capturing_ some information from the neural
+network during it's training as a function of time. That might be the
+parameters (e.g weights & biases), but that's already done before and is
+too lame to do here again. We need something cooler. The main idea came
+from a YouTube video (**_insert video here_**) which was to evaluate the
+network on some randomly chosen inputs in the training loop. This method
+yields a set of vectors as signals over time, one for each input.
+The vectors can be acquired from any dense layer we wish, which provides
+even more insight into what is actually happening inside each layer.
+
+> Maybe train some more models which use something like ImageNet as base and fine-tunes to less class counts
+
+With the information source checked, now we have to tackle the next challenge:
+Visualizing a bunch of high-dimensional vectors
+
+Again from that YouTube video I watched, the obvious solution was using
+UMAP or some other
+[dimension-<span className={props.classes.reduction}>reduction</span> algorithm](https://en.wikipedia.org/wiki/Dimensionality_reduction).
+I finally decided to use UMAP because:
+
+1. It was featured in the video and had nice result
+2. I tried it myself and got nice result
+3. A friend suggested that it would be nice
+4. It is not [too slow](https://umap-learn.readthedocs.io/en/latest/performance.html)
+
+Now, combining these two magic tricks, we now have a bunch of 2D vector
+signals over time that are _hopefully_ continuous, and the simplest way
+of visualizing them is to draw circles/dots at those coordinates:
+
+export const DocScatterBlock = function ({ capture, playbackControlsClassName }) {
+  // TODO: Pause on click
+	// const controller = useRef(new Controller())
+	const [controller, _] = useState(new Controller())
+
+    useEffect(() => {
+        controller.capture = capture
+        return () => {
+            Controller.removeInstance(controller)
+        }
+    }, [capture])
+
+    return <VisScatterBlock variations={capture.variations} colorMap="tab10" controller={controller} showControls={false} showPlaybackControls={true} playbackControlsClassName={playbackControlsClassName} />
+
+}
+
+<div>
+  <div className={`${props.classes.visBlock} ${props.monoFont.className}`}>
+    {/* <VisScatterBlock variations={props.variations} colorMap="tab10" /> */}
+    <DocScatterBlock
+      capture={props.capture}
+      playbackControlsClassName={props.classes.playBackControl}
+    />
+  </div>
+</div>
+
+But... As you can _probably_ tell, the result is pretty noisy. The problem is that...
+
+> Insert the problem here
+
+To tackle that, a frequency filter can be used. I used the Butterworth filter, because...
+
+And the result, was truly satisfying

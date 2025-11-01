@@ -13,7 +13,7 @@ import {
   useColorScheme,
 } from '@mui/joy'
 import React, { useEffect, useState } from 'react'
-import GlobalController from '@/lib/global_controller'
+import { globalController } from '@/lib/controller'
 import { DarkModeRounded, LightModeRounded } from '@mui/icons-material'
 import captures from '@/lib/captures'
 import Head from 'next/head'
@@ -42,7 +42,7 @@ function Branding() {
         variant="outlined"
         placement="right"
       >
-        <h1 className="text-2xl my-auto">NNVis</h1>
+        <h1 className="text-2xl my-auto">FlockNet</h1>
       </Tooltip>
 
       <Box className="top-8 left-8 flex items-center gap-1" fontSize={15}>
@@ -117,17 +117,9 @@ function Home() {
   // TODO: Expensive state to handle!
   const [plotCount, setPlotCount] = useState(3)
   const [colorMap, setColorMap] = useState('tab10')
-  const [classMask, setClassMask] = useState([] as number[])
 
   useEffect(() => {
-    GlobalController.setClassMask(classMask)
-  }, [classMask])
-
-  useEffect(() => {
-    const classCount = captures[captureIdx].classes?.length ?? 0
-    setClassMask(new Array(classCount).fill(1))
-
-    GlobalController.capture = capture
+    globalController.capture = capture
   }, [captureIdx, capture])
 
   useEffect(() => {
@@ -144,15 +136,15 @@ function Home() {
 
       if (event.code === 'Space') {
         event.preventDefault()
-        GlobalController.setIsPlaying(!GlobalController.isPlaying)
+        globalController.setIsPlaying(!globalController.isPlaying)
       } else if (event.code == 'ArrowRight') {
         event.preventDefault()
-        GlobalController.setTime(GlobalController.time + 1)
-        GlobalController.setIsPlaying(false)
+        globalController.setTime(globalController.time + 1)
+        globalController.setIsPlaying(false)
       } else if (event.code == 'ArrowLeft') {
         event.preventDefault()
-        GlobalController.setTime(GlobalController.time - 1)
-        GlobalController.setIsPlaying(false)
+        globalController.setTime(globalController.time - 1)
+        globalController.setIsPlaying(false)
       }
     }
 
@@ -168,7 +160,7 @@ function Home() {
   return (
     <>
       <Head>
-        <title>NNVis</title>
+        <title>FlockNet</title>
         <link rel="icon" href={router.basePath + '/favicon.ico'} />
       </Head>
 
@@ -197,7 +189,11 @@ function Home() {
         </Box>
 
         <Box className="flex flex-wrap justify-center pt-8">
-          <ClassChips capture={capture} colorMap={colorMap} />
+          <ClassChips
+            capture={capture}
+            colorMap={colorMap}
+            key={capture.path}
+          />
         </Box>
 
         <Box className="pt-4">

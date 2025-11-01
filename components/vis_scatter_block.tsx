@@ -1,5 +1,5 @@
 import { buildColormap } from '@/lib/colormaps'
-import GlobalController from '@/lib/global_controller'
+import { Controller, globalController } from '@/lib/controller'
 import Variation from '@/lib/variation'
 import Visualization from '@/lib/visualization'
 import {
@@ -10,7 +10,9 @@ import {
   TuneRounded,
 } from '@mui/icons-material'
 import {
+  Box,
   Button,
+  Chip,
   CircularProgress,
   Divider,
   Option,
@@ -22,16 +24,97 @@ import {
 } from '@mui/joy'
 import { useRouter } from 'next/router'
 import { RefObject, useEffect, useId, useRef, useState } from 'react'
+import PlayPauseIcon from './play_pause_icon'
+
+function VariationOption({
+  variation,
+  small,
+}: {
+  variation: Variation
+  small?: boolean
+}) {
+  const match = variation.name.match(/bw(\d+(?:\.\d+)?)-f(\d+(?:\.\d+)?)/)
+  if (match) {
+    const bw = match[1]
+    const ff = 'fp' + match[2]
+    return (
+      <Box className="flex gap-1">
+        <Chip
+          variant="soft"
+          color="primary"
+          size={(small ?? false) ? 'sm' : 'md'}
+        >
+          &omega;={bw}
+        </Chip>
+        <Chip
+          variant="soft"
+          color="success"
+          size={(small ?? false) ? 'sm' : 'md'}
+        >
+          {ff}
+        </Chip>
+      </Box>
+    )
+  }
+  return variation.name
+}
+
+function EmbeddedPlaybackController({
+  controller,
+  className,
+}: {
+  controller: Controller
+  className: string
+}) {
+  const [isPlaying, setIsPlaying] = useState(true)
+
+  useEffect(() => {
+    controller.reactSetIsPlaying = setIsPlaying
+  }, [controller])
+
+  return (
+    <div
+      data-is-playing={isPlaying}
+      className={`absolute ${className}`}
+      style={{ bottom: '1rem', left: '1rem' }}
+    >
+      <Button
+        className="inline-flex w-9 min-w-9 h-9 min-h-9! p-2! rounded-full!"
+        variant="plain"
+        color="neutral"
+        onClick={() => controller.setIsPlaying(!isPlaying)}
+      >
+        <span className="flex justify-center items-center">
+          <PlayPauseIcon isPlaying={isPlaying} />
+        </span>
+      </Button>
+    </div>
+  )
+}
 
 interface VisScatterBlockProps {
   variations: Variation[]
   colorMap: string
+
+  controller?: Controller
+  showControls?: boolean
+  showPlaybackControls?: boolean
+  playbackControlsClassName?: string
 }
 
 export default function VisScatterBlock({
   variations,
   colorMap,
+  controller: passedController,
+  showControls: passedShowControls,
+
+  showPlaybackControls: passedShowPlaybackControls,
+  playbackControlsClassName: passedShowPlaybackControlsClassName,
 }: VisScatterBlockProps) {
+  const showControls = passedShowControls ?? true
+  const showPlaybackControls = passedShowPlaybackControls ?? false
+  const playbackControlsClassName = passedShowPlaybackControlsClassName ?? ''
+
   const componentId = useId()
 
   const canvas: RefObject<HTMLCanvasElement | null> = useRef(null)
@@ -46,16 +129,18 @@ export default function VisScatterBlock({
 
   const [renderStyle, setRenderStyle] = useState('dots')
   const [tailFalloff, setTailFalloff] = useState(10)
-  const [radius, setRadius] = useState(3.5)
+  const [radius, setRadius] = useState(2.5)
   const [opacity, setOpacity] = useState(100)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [fraction, setFraction] = useState(2000)
+  const [fraction, _setFraction] = useState(2000)
+
+  const controller = passedController ?? globalController
 
   /* eslint react-hooks/exhaustive-deps: 0 */
   useEffect(() => {
     vis.current = new Visualization(
       componentId,
       canvas.current as HTMLCanvasElement,
+      controller,
       setIsLoading,
       setLoadPercentage,
       {
@@ -69,9 +154,8 @@ export default function VisScatterBlock({
       },
     )
 
-    GlobalController.register(componentId, vis.current)
-
-    return () => GlobalController.unRegister(componentId)
+    controller.register(componentId, vis.current)
+    return () => controller.unRegister(componentId)
   }, [])
 
   const router = useRouter()
@@ -101,123 +185,129 @@ export default function VisScatterBlock({
   const radiusResolution = 100
 
   return (
-    <div className="vis-container mb-10 max-w-full">
-      <div className="flex items-stretch justify-evenly px-2 gap-2">
-        <Tooltip
-          arrow
-          variant="outlined"
-          title="Variation: different smoothness levels and floating point formats"
-        >
-          <Select
-            startDecorator={<TuneRounded />}
-            className="grow-1"
-            value={variation}
-            placeholder="Variation"
-            onChange={(_, value) => setVariation(value ?? 0)}
+    <div className="mb-10 max-w-full">
+      {showControls && (
+        <div className="flex items-stretch justify-evenly gap-2">
+          <Tooltip
+            arrow
+            variant="outlined"
+            title="Variation: different smoothness levels and floating point formats"
           >
-            {variations.map((v, index) => (
-              <Option value={index} key={index}>
-                {v.name}
-              </Option>
-            ))}
-          </Select>
-        </Tooltip>
-
-        <Tooltip
-          arrow
-          variant="outlined"
-          title="Channel: the stage at which data was captured. e.g. different NN layers"
-        >
-          <Select
-            startDecorator={<LayersRounded />}
-            className="grow-1"
-            value={channel}
-            placeholder="Channel"
-            onChange={(_, value) => setChannel(value ?? 0)}
-          >
-            {variations[variation]?.channels.map((v, index) => (
-              <Option value={index} key={index}>
-                {v.name}
-              </Option>
-            ))}
-          </Select>
-        </Tooltip>
-
-        <ToggleButtonGroup
-          value={renderStyle}
-          onChange={(_, value) => setRenderStyle(value ?? 'dots')}
-          aria-label="Render style"
-          size="sm"
-        >
-          <Tooltip arrow variant="outlined" title="Dots">
-            <Button value="dots">
-              <GrainRounded />
-            </Button>
+            <Select
+              startDecorator={<TuneRounded />}
+              className="grow-1"
+              value={variation}
+              placeholder="Variation"
+              onChange={(_, value) => setVariation(value ?? 0)}
+              // renderValue={selected => <VariationOption variation={variations[selected?.value ?? 0]} />}
+              renderValue={(selected) => variations[selected?.value ?? 0].name}
+            >
+              {variations.map((v, index) => (
+                <Option value={index} key={index}>
+                  <VariationOption variation={v} />
+                </Option>
+              ))}
+            </Select>
           </Tooltip>
 
-          <Tooltip arrow variant="outlined" title="Lines (tail)">
-            <Button value="lines-tail">
-              <SsidChartRounded />
+          <Tooltip
+            arrow
+            variant="outlined"
+            title="Channel: the stage at which data was captured. e.g. different NN layers"
+          >
+            <Select
+              startDecorator={<LayersRounded />}
+              className="grow-1"
+              value={channel}
+              placeholder="Channel"
+              onChange={(_, value) => setChannel(value ?? 0)}
+            >
+              {variations[variation]?.channels.map((v, index) => (
+                <Option value={index} key={index}>
+                  {v.name}
+                </Option>
+              ))}
+            </Select>
+          </Tooltip>
+
+          <ToggleButtonGroup
+            value={renderStyle}
+            onChange={(_, value) => setRenderStyle(value ?? 'dots')}
+            aria-label="Render style"
+            size="sm"
+          >
+            <Tooltip arrow variant="outlined" title="Dots">
+              <Button value="dots">
+                <GrainRounded />
+              </Button>
+            </Tooltip>
+
+            <Tooltip arrow variant="outlined" title="Lines (tail)">
+              <Button value="lines-tail">
+                <SsidChartRounded />
+              </Button>
+            </Tooltip>
+            {/* <Button className="grow-1" value="dots-tail">Budget-mode Tail</Button> */}
+            {/* <Button className="grow-1" value="lines-tail">Totally Accurate Tail Simulation</Button> */}
+          </ToggleButtonGroup>
+
+          <Tooltip
+            arrow
+            placement="bottom-end"
+            variant="outlined"
+            leaveDelay={300}
+            // describeChild
+            disableFocusListener
+            title={
+              <div className="w-80 pl-2.5 pr-4">
+                <div className="flex items-center justify-evenly -mb-3">
+                  <label className="min-w-18">Radius</label>
+                  <Slider
+                    aria-label="Radius"
+                    value={radius * radiusResolution}
+                    onChange={(_, value) =>
+                      setRadius((value as number) / radiusResolution)
+                    }
+                    min={1 * radiusResolution}
+                    max={20 * radiusResolution}
+                    size="sm"
+                  />
+                </div>
+
+                <div className="flex items-center justify-evenly">
+                  <label className="min-w-18">Opacity</label>
+                  <Slider
+                    aria-label="Opacity"
+                    value={opacity}
+                    onChange={(_, value) => setOpacity(value as number)}
+                    min={0}
+                    max={100}
+                    size="sm"
+                  />
+                </div>
+
+                <Divider>Tail</Divider>
+
+                <div className="flex items-center justify-evenly">
+                  <label className="min-w-18">Falloff</label>
+                  <Slider
+                    disabled={!renderStyle.endsWith('tail')}
+                    aria-label="Tail falloff"
+                    value={tailFalloff}
+                    onChange={(_, value) => setTailFalloff(value as number)}
+                    max={100}
+                    size="sm"
+                  />
+                </div>
+              </div>
+            }
+          >
+            <Button sx={{ padding: 1 }} size="sm">
+              <SettingsRounded />
             </Button>
           </Tooltip>
-          {/* <Button className="grow-1" value="dots-tail">Budget-mode Tail</Button> */}
-          {/* <Button className="grow-1" value="lines-tail">Totally Accurate Tail Simulation</Button> */}
-        </ToggleButtonGroup>
-
-        <Tooltip
-          arrow
-          placement="bottom-end"
-          variant="outlined"
-          disableFocusListener
-          title={
-            <div className="w-80 pl-2.5 pr-4">
-              <div className="flex items-center justify-evenly -mb-3">
-                <label className="min-w-18">Radius</label>
-                <Slider
-                  aria-label="Radius"
-                  value={radius * radiusResolution}
-                  onChange={(_, value) =>
-                    setRadius((value as number) / radiusResolution)
-                  }
-                  min={1 * radiusResolution}
-                  max={20 * radiusResolution}
-                  size="sm"
-                />
-              </div>
-
-              <div className="flex items-center justify-evenly">
-                <label className="min-w-18">Opacity</label>
-                <Slider
-                  aria-label="Opacity"
-                  value={opacity}
-                  onChange={(_, value) => setOpacity(value as number)}
-                  min={0}
-                  max={100}
-                  size="sm"
-                />
-              </div>
-
-              <Divider>Tail</Divider>
-
-              <div className="flex items-center justify-evenly">
-                <label className="min-w-18">Falloff</label>
-                <Slider
-                  disabled={!renderStyle.endsWith('tail')}
-                  aria-label="Tail falloff"
-                  value={tailFalloff}
-                  onChange={(_, value) => setTailFalloff(value as number)}
-                  max={100}
-                  size="sm"
-                />
-              </div>
-            </div>
-          }
-        >
-          <Button sx={{ padding: 1 }} size="sm">
-            <SettingsRounded />
-          </Button>
-        </Tooltip>
-      </div>
+        </div>
+      )}
 
       {/* <div className="flex items-center justify-evenly mb-0 pl-2.5 pr-4">
                 <label className="min-w-35">Fraction</label>
@@ -243,7 +333,19 @@ export default function VisScatterBlock({
             </CircularProgress>
           </div>
         ) : null}
-        <canvas ref={canvas} width="1024px" height="1024px"></canvas>
+
+        {showPlaybackControls && (
+          <EmbeddedPlaybackController
+            controller={controller}
+            className={playbackControlsClassName}
+          />
+        )}
+        <canvas
+          ref={canvas}
+          width="1024px"
+          height="1024px"
+          className="block border-1 border-solid rounded-[6px] w-full max-w-[512px]"
+        />
       </div>
     </div>
   )

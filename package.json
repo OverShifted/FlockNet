@@ -15,7 +15,7 @@
     "@mdx-js/react": "^3.1.1",
     "@mui/icons-material": "^7",
     "@mui/joy": "^5.0.0-beta.52",
-    "@next/mdx": "^16.0.0",
+    "@next/mdx": "^16",
     "@types/mdx": "^2.0.13",
     "next": "16",
     "react": "^19.0.0",

@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   output: 'export',
   images: { unoptimized: true },
+  basePath: process.env['NEXT_BASE_PATH'],
 
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
 

@@ -318,10 +318,10 @@ export default function VisScatterBlock({
             </div> */}
 
       <div className="relative mt-3">
-        {isLoading ? (
+        {isLoading && (
           <div
             className="absolute"
-            style={{ top: 'calc(50% - 20px)', left: 'calc(50% - 20px)' }}
+            style={{ top: 'calc(50% - 32px)', left: 'calc(50% - 32px)' }}
           >
             <CircularProgress
               value={isNaN(loadPercentage) ? undefined : loadPercentage}
@@ -332,7 +332,7 @@ export default function VisScatterBlock({
               </Typography>
             </CircularProgress>
           </div>
-        ) : null}
+        )}
 
         {showPlaybackControls && (
           <EmbeddedPlaybackController
@@ -344,7 +344,7 @@ export default function VisScatterBlock({
           ref={canvas}
           width="1024px"
           height="1024px"
-          className="block border-1 border-solid rounded-[6px] w-full max-w-[512px]"
+          className="block border border-solid rounded-md w-full max-w-lg"
         />
       </div>
     </div>

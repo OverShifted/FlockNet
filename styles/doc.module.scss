@@ -1,10 +1,11 @@
 .markdownRoot {
   width: 100%;
   margin: 5em 0;
-
+  
   > div {
-    max-width: 700px;
+    max-width: 750px;
     margin: 0 auto;
+    padding: 0 1.25rem;
   }
 
   blockquote {
@@ -67,7 +68,7 @@
   }
 
   .visBlock {
-    width: 500px;
+    max-width: 500px;
     margin: 2rem auto;
 
     &:hover {
@@ -91,7 +92,6 @@
     }
 
     canvas {
-      // border: none;
       box-shadow: none;
       border-radius: 25px;
 

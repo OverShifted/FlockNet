@@ -130,7 +130,7 @@ function Options({
                     <Link
                       level="body-xs"
                       href={
-                        'https://github.com/OverShifted/nnvis/tree/master/' +
+                        'https://github.com/OverShifted/FlockNet/tree/master/' +
                         cap.path
                       }
                       endDecorator={<CallMadeRounded />}

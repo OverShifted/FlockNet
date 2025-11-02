@@ -29,7 +29,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      NEXT_BASE_PATH: '/nnvis'
+      NEXT_BASE_PATH: "/${{ github.event.repository.name }}"
     steps:
       - name: Checkout
         uses: actions/checkout@v4

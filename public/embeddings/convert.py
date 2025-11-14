@@ -25,18 +25,6 @@ print(f"Converting to {args.fp_type}{'with delta encoding' if args.delta_encodin
 input_file = open(args.input, 'rb')
 output_file = open(args.output, 'wb')
 
-# input_file = open("./embedding-smoothed-50-0.1.np", 'rb')
-
-# output_file = open("./embedding-smoothed-50-0.1-fp16.np", 'wb')
-# output_file = open("./embedding-smoothed-50-0.1-float8_e3m4.np", 'wb')
-# output_file = open("./embedding-smoothed-50-0.2-float8_e3m4-delta.np", 'wb')
-# output_file = open("./embedding-smoothed-50-0.2-float8_e4m3-delta.np", 'wb')
-# output_file = open("./embedding-smoothed-50-0.2-float8_e4m3.np", 'wb')
-
-# output_file = open("./embedding-smoothed-50-0.1-float8_e4m3.np", 'wb')
-
-# delta_f8 = np.dtype(float8_e3m4, metadata={"delta": True})
-
 def delta_encode(input_ndarray):
     diff = np.diff(input_ndarray, axis=0)
     return np.concat([np.array([input_ndarray[0]]), diff], axis=0)

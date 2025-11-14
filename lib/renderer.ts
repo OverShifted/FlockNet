@@ -128,7 +128,7 @@ export default class Renderer {
         this._drawCircle(
           x,
           y,
-          i === hoveredSampleIdx
+          (i === hoveredSampleIdx && !tailMode)
             ? radius + 2 * Math.exp(-0.2 * radius)
             : radius,
           maskedColor,

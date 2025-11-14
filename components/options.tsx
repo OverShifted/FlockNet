@@ -56,7 +56,7 @@ function ColormapSelect({
 }: ColormapSelectProps) {
   return (
     <Select
-      // className="grow-1"
+      // className="grow"
       value={colorMap}
       renderValue={(selected) => {
         return <ColormapOption v={selected?.value ?? ''} />

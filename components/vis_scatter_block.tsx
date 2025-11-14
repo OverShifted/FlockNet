@@ -346,6 +346,7 @@ export default function VisScatterBlock({
             open={true}
             variant="outlined"
             arrow
+            placement='top'
           >
             <div
               className="absolute select-none"
@@ -353,7 +354,7 @@ export default function VisScatterBlock({
                 // top: mouseCollision.mouseY,
                 // left: mouseCollision.mouseX,
 
-                top: mouseCollision.sampleY + radius,
+                top: mouseCollision.sampleY - radius,
                 left: mouseCollision.sampleX,
 
                 // width: 1,

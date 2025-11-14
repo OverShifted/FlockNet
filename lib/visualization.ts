@@ -206,11 +206,8 @@ class Visualization {
     )
   }
 
-  _isHovered(x: number, y: number, radius: number): boolean {
-    return (
-      Math.pow(x - this.mouseX, 2) + Math.pow(y - this.mouseY, 2) <
-      Math.pow(radius, 2)
-    )
+  _distance2WithMouse(x: number, y: number) {
+    return Math.pow(x - this.mouseX, 2) + Math.pow(y - this.mouseY, 2)
   }
 
   getHoveredSample(): MouseCollision | null {
@@ -218,6 +215,17 @@ class Visualization {
     if (!array || !this.variation) return null
 
     const [xBounds, yBounds] = this.variation.channels[this.channel].bounds
+    const radius2 = Math.pow(this.radius, 2)
+    let closest = {
+      dist2: Infinity,
+      sampleIdx: 0,
+      sampleX: 0,
+      sampleY: 0,
+
+      mouseX: this.mouseX,
+      mouseY: this.mouseY,
+    }
+
     for (let i = array.shape[1] - 1; i >= 0; i--) {
       const x = remap(
         lerpSample(array, this.controller.time, i, 0) as number,
@@ -230,7 +238,9 @@ class Visualization {
         [0, this.canvas.getBoundingClientRect().height],
       )
 
-      if (this._isHovered(x, y, this.radius))
+      const distance2 = this._distance2WithMouse(x, y)
+
+      if (distance2 <= radius2)
         return {
           sampleIdx: i,
           sampleX: x,
@@ -239,7 +249,18 @@ class Visualization {
           mouseX: this.mouseX,
           mouseY: this.mouseY,
         }
+
+      if (distance2 < closest.dist2) {
+        closest.dist2 = distance2
+
+        closest.sampleIdx = i
+        closest.sampleX = x
+        closest.sampleY = y
+      }
     }
+
+    if (closest.dist2 < radius2 * Math.pow(7, 2))
+      return closest
 
     return null
   }

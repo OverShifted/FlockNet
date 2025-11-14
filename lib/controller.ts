@@ -1,5 +1,5 @@
 import Capture from './capture'
-import Visualization from './visualization'
+import { Visualization } from './visualization'
 
 // Manages the playback of a group of Visualization instances
 class Controller {
@@ -96,7 +96,6 @@ function tick() {
   const deltaTime = now - then
   then = now
 
-  // console.log(Controller.instances)
   Controller.instances.map((c) => c.tick(deltaTime * 0.001))
   requestAnimationFrame(tick)
 }

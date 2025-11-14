@@ -1,3 +1,5 @@
+import { NDArray } from './numpy_loader'
+
 function parseColor(color: string): [number, number, number] {
   if (color === 'white') return [255, 255, 255]
 
@@ -27,4 +29,23 @@ function linspace(start: number, stop: number, num: number) {
   return Array.from({ length: num }, (_, i) => start + step * i)
 }
 
-export { mixColors, linspace }
+function remap(
+  x: number,
+  initial_range: [number, number],
+  target_range: [number, number],
+) {
+  const a =
+    (target_range[1] - target_range[0]) / (initial_range[1] - initial_range[0])
+  return a * (x - initial_range[0]) + target_range[0]
+}
+
+function lerpSample(array: NDArray, frame: number, x: number, y: number) {
+  const lastFrame = Math.floor(frame)
+  const t = frame - lastFrame
+  const a = array.at(lastFrame, x, y) as number
+  const b = array.at(lastFrame + 1, x, y) as number
+
+  return a * (1 - t) + b * t
+}
+
+export { mixColors, linspace, remap, lerpSample }

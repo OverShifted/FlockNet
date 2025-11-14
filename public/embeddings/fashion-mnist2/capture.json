@@ -1,0 +1,181 @@
+{
+  "name": "Fashion MNIST #2",
+  "frameCount": 1407,
+  "variations": [
+    {
+      "name": "bw0.08-f16",
+      "format": "float16",
+      "deltaEncoded": false,
+      "channels": [
+        {
+          "name": "fc1",
+          "bounds": [
+            [
+              -12.755468749999999,
+              20.59140625
+            ],
+            [
+              -12.139843749999999,
+              19.632031249999997
+            ]
+          ]
+        },
+        {
+          "name": "fc1-relu",
+          "bounds": [
+            [
+              -10.30546875,
+              22.51640625
+            ],
+            [
+              -9.182421875,
+              23.334765625
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "bw0.01-f16",
+      "format": "float16",
+      "deltaEncoded": false,
+      "channels": [
+        {
+          "name": "fc1",
+          "bounds": [
+            [
+              -11.282812499999999,
+              20.4234375
+            ],
+            [
+              -12.08046875,
+              19.54140625
+            ]
+          ]
+        },
+        {
+          "name": "fc1-relu",
+          "bounds": [
+            [
+              -10.204687499999999,
+              22.0640625
+            ],
+            [
+              -9.016015625,
+              21.973046875
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "bw0.005-f16",
+      "format": "float16",
+      "deltaEncoded": false,
+      "channels": [
+        {
+          "name": "fc1",
+          "bounds": [
+            [
+              -11.01953125,
+              20.43359375
+            ],
+            [
+              -12.056249999999999,
+              19.55625
+            ]
+          ]
+        },
+        {
+          "name": "fc1-relu",
+          "bounds": [
+            [
+              -10.2265625,
+              22.1171875
+            ],
+            [
+              -9.008984374999999,
+              22.176953124999997
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "bw0.001-f16",
+      "format": "float16",
+      "deltaEncoded": false,
+      "channels": [
+        {
+          "name": "fc1",
+          "bounds": [
+            [
+              -5.3548828125,
+              14.3958984375
+            ],
+            [
+              -6.379687499999999,
+              12.0515625
+            ]
+          ]
+        },
+        {
+          "name": "fc1-relu",
+          "bounds": [
+            [
+              -3.7703124999999993,
+              15.1296875
+            ],
+            [
+              -1.34027099609375,
+              17.44854736328125
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "has_x_preview": true,
+  "classes": [
+    [
+      "T-shirt/top",
+      "class-0.png"
+    ],
+    [
+      "Trouser",
+      "class-1.png"
+    ],
+    [
+      "Pullover",
+      "class-2.png"
+    ],
+    [
+      "Dress",
+      "class-3.png"
+    ],
+    [
+      "Coat",
+      "class-4.png"
+    ],
+    [
+      "Sandal",
+      "class-5.png"
+    ],
+    [
+      "Shirt",
+      "class-6.png"
+    ],
+    [
+      "Sneaker",
+      "class-7.png"
+    ],
+    [
+      "Bag",
+      "class-8.png"
+    ],
+    [
+      "Ankle boot",
+      "class-9.png"
+    ]
+  ]
+}

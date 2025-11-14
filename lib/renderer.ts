@@ -1,16 +1,7 @@
 import { Controller } from './controller'
 import { NDArray } from './numpy_loader'
+import { lerpSample, remap } from './utils'
 import Variation from './variation'
-
-function remap(
-  x: number,
-  initial_range: [number, number],
-  target_range: [number, number],
-) {
-  const a =
-    (target_range[1] - target_range[0]) / (initial_range[1] - initial_range[0])
-  return a * (x - initial_range[0]) + target_range[0]
-}
 
 function hex2rgb(hex: string, opacity: number | undefined = undefined) {
   hex = hex.trim()
@@ -77,12 +68,14 @@ export default class Renderer {
     tailFalloff: number,
     isPlaying: boolean,
     _fraction: number,
+    hoveredSampleIdx: number | null = null,
   ) {
     if (!(tailMode && frame != 0)) this.clear()
 
     const array = this.array[channel_id]
     const [xBounds, yBounds] = this.variation.channels[channel_id].bounds
 
+    // Fade tails over time
     if (tailMode && isPlaying) {
       this.ctx.beginPath()
       this.ctx.rect(0, 0, this.canvas.width, this.canvas.height)
@@ -93,43 +86,53 @@ export default class Renderer {
       this.ctx.fill()
     }
 
-    function getMaskedColor(mask: number, colorid: number) {
-      if (mask === undefined || mask > 0.5) return colormap[colorid]
-      else
-        return colormap[colorid].replace(
-          /(,\s*\d*%)?\)/g,
-          `,${1000 / array.shape[1]}%)`,
-        )
-    }
+    function getMaskedColor(mask: number, colorid: number, idx: number) {
+      const shouldFade =
+        (hoveredSampleIdx !== null && idx !== hoveredSampleIdx) ||
+        (mask !== undefined && mask < 0.5)
 
-    function arrayAt(frame: number, x: number, y: number) {
-      const lastFrame = Math.floor(frame)
-      const t = frame - lastFrame
-      const a = array.at(lastFrame, x, y) as number
-      const b = array.at(lastFrame + 1, x, y) as number
-
-      return a * (1 - t) + b * t
+      return shouldFade
+        ? colormap[colorid].replace(
+            /(,\s*\d*%)?\)/g,
+            `,${2000 / array.shape[1]}%)`,
+          )
+        : colormap[colorid]
     }
 
     for (let i = 0; i < array.shape[1]; i++) {
-      const x = remap(arrayAt(frame, i, 0) as number, xBounds, [0, 1])
-      const y = remap(arrayAt(frame, i, 1) as number, yBounds, [0, 1])
+      const x = remap(lerpSample(array, frame, i, 0) as number, xBounds, [0, 1])
+      const y = remap(lerpSample(array, frame, i, 1) as number, yBounds, [0, 1])
 
       const classid = this.array[this.array.length - 1].data[i] as number
       const colorid = classid
       const mask = this.controller.classMask[classid]
-      const maskedColor = getMaskedColor(mask, colorid)
+      const maskedColor = getMaskedColor(mask, colorid, i)
 
       if (tailMode) {
         const lastFrame = frame - this.controller.timeDeltaLastTick
-        const ax = remap(arrayAt(lastFrame, i, 0) as number, xBounds, [0, 1])
-        const ay = remap(arrayAt(lastFrame, i, 1) as number, yBounds, [0, 1])
+        const ax = remap(
+          lerpSample(array, lastFrame, i, 0) as number,
+          xBounds,
+          [0, 1],
+        )
+        const ay = remap(
+          lerpSample(array, lastFrame, i, 1) as number,
+          yBounds,
+          [0, 1],
+        )
 
         this._drawLine([ax, ay], [x, y], radius * 2, maskedColor)
-        if (taTailMode) this._drawCircle(x, y, radius, maskedColor)
-      } else {
-        this._drawCircle(x, y, radius, maskedColor)
       }
+
+      if (!tailMode || taTailMode)
+        this._drawCircle(
+          x,
+          y,
+          i === hoveredSampleIdx
+            ? radius + 2 * Math.exp(-0.2 * radius)
+            : radius,
+          maskedColor,
+        )
     }
   }
 

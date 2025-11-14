@@ -2,9 +2,19 @@ import AssetManager from './asset_manager'
 import { Controller } from './controller'
 import { NDArray } from './numpy_loader'
 import Renderer from './renderer'
+import { lerpSample, remap } from './utils'
 import Variation from './variation'
 
-export default class Visualization {
+interface MouseCollision {
+  sampleIdx: number
+  sampleX: number
+  sampleY: number
+
+  mouseX: number
+  mouseY: number
+}
+
+class Visualization {
   id: string
 
   // Pending or loaded
@@ -15,6 +25,7 @@ export default class Visualization {
 
   reactSetIsLoading: (_isLoading: boolean) => void
   reactSetLoadPercentage: (_percentage: number) => void
+  reactSetMouseCollision: (_collision: MouseCollision | null) => void
 
   channel: number
   colorMap: string[]
@@ -26,12 +37,19 @@ export default class Visualization {
 
   colorMapWithTransparency: string[]
 
+  hoveredSampleIdx: number | null = null
+
+  mouseMoveListener: (_e: MouseEvent) => void
+  mouseX: number = -1
+  mouseY: number = -1
+
   constructor(
     id: string,
     canvas: HTMLCanvasElement,
     controller: Controller,
     reactSetIsLoading: (_isLoading: boolean) => void,
     reactSetLoadPercentage: (_percentage: number) => void,
+    reactSetMouseCollision: (_collision: MouseCollision | null) => void,
     options: {
       channel: number
       colorMap: string[]
@@ -48,6 +66,7 @@ export default class Visualization {
 
     this.reactSetIsLoading = reactSetIsLoading
     this.reactSetLoadPercentage = reactSetLoadPercentage
+    this.reactSetMouseCollision = reactSetMouseCollision
 
     this.channel = options.channel
     this.colorMap = options.colorMap
@@ -59,10 +78,50 @@ export default class Visualization {
 
     this.colorMapWithTransparency = []
     this.buildColorMapWithTransparency()
+
+    this.mouseMoveListener = (event) => {
+      const rect = this.canvas.getBoundingClientRect()
+      const x = event.clientX - rect.left
+      const y = event.clientY - rect.top
+
+      this.mouseX = x
+      this.mouseY = y
+
+      const collision = this.getHoveredSample()
+      this.hoveredSampleIdx = collision?.sampleIdx ?? null
+      reactSetMouseCollision(collision)
+      // reactSetMouseCollision({
+      //   sampleIdx: collision?.sampleIdx ?? -1,
+      //   mouseX: x,
+      //   mouseY: y,
+
+      //   sampleX: x,
+      //   sampleY: y,
+      // })
+
+      this.draw()
+    }
+
+    this.canvas.addEventListener(
+      Visualization._pointerEventType(),
+      this.mouseMoveListener,
+    )
+  }
+
+  shutdown() {
+    this.canvas.removeEventListener(
+      Visualization._pointerEventType(),
+      this.mouseMoveListener,
+    )
+  }
+
+  static _pointerEventType() {
+    return window.PointerEvent ? 'pointermove' : 'mousemove'
   }
 
   _setArray(array: NDArray[], variation: Variation) {
     this.renderer = new Renderer(array, variation, this.canvas, this.controller)
+    this.variation = variation
     this.draw()
   }
 
@@ -143,6 +202,48 @@ export default class Visualization {
       this.tailFalloff,
       this.controller.isPlaying,
       this.fraction,
+      this.controller.capture?.hasXPreview ? this.hoveredSampleIdx : null,
     )
   }
+
+  _isHovered(x: number, y: number, radius: number): boolean {
+    return (
+      Math.pow(x - this.mouseX, 2) + Math.pow(y - this.mouseY, 2) <
+      Math.pow(radius, 2)
+    )
+  }
+
+  getHoveredSample(): MouseCollision | null {
+    const array = this.renderer?.array[this.channel]
+    if (!array || !this.variation) return null
+
+    const [xBounds, yBounds] = this.variation.channels[this.channel].bounds
+    for (let i = array.shape[1] - 1; i >= 0; i--) {
+      const x = remap(
+        lerpSample(array, this.controller.time, i, 0) as number,
+        xBounds,
+        [0, this.canvas.getBoundingClientRect().width],
+      )
+      const y = remap(
+        lerpSample(array, this.controller.time, i, 1) as number,
+        yBounds,
+        [0, this.canvas.getBoundingClientRect().height],
+      )
+
+      if (this._isHovered(x, y, this.radius))
+        return {
+          sampleIdx: i,
+          sampleX: x,
+          sampleY: y,
+
+          mouseX: this.mouseX,
+          mouseY: this.mouseY,
+        }
+    }
+
+    return null
+  }
 }
+
+export { Visualization }
+export type { MouseCollision }

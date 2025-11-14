@@ -1,7 +1,7 @@
 import { buildColormap } from '@/lib/colormaps'
 import { Controller, globalController } from '@/lib/controller'
 import Variation from '@/lib/variation'
-import Visualization from '@/lib/visualization'
+import { MouseCollision, Visualization } from '@/lib/visualization'
 import {
   GrainRounded,
   LayersRounded,
@@ -25,6 +25,7 @@ import {
 import { useRouter } from 'next/router'
 import { RefObject, useEffect, useId, useRef, useState } from 'react'
 import PlayPauseIcon from './play_pause_icon'
+import Image from 'next/image'
 
 function VariationOption({
   variation,
@@ -126,6 +127,9 @@ export default function VisScatterBlock({
   // const [colorMap, setColorMap] = useState(colorMaps[0])
   const [isLoading, setIsLoading] = useState(true)
   const [loadPercentage, setLoadPercentage] = useState(0)
+  const [mouseCollision, setMouseCollision] = useState<MouseCollision | null>(
+    null,
+  )
 
   const [renderStyle, setRenderStyle] = useState('dots')
   const [tailFalloff, setTailFalloff] = useState(10)
@@ -143,6 +147,7 @@ export default function VisScatterBlock({
       controller,
       setIsLoading,
       setLoadPercentage,
+      setMouseCollision,
       {
         channel,
         colorMap: buildColormap(colorMap),
@@ -155,7 +160,10 @@ export default function VisScatterBlock({
     )
 
     controller.register(componentId, vis.current)
-    return () => controller.unRegister(componentId)
+    return () => {
+      controller.unRegister(componentId)
+      vis.current?.shutdown()
+    }
   }, [])
 
   const router = useRouter()
@@ -195,7 +203,7 @@ export default function VisScatterBlock({
           >
             <Select
               startDecorator={<TuneRounded />}
-              className="grow-1"
+              className="grow"
               value={variation}
               placeholder="Variation"
               onChange={(_, value) => setVariation(value ?? 0)}
@@ -217,7 +225,7 @@ export default function VisScatterBlock({
           >
             <Select
               startDecorator={<LayersRounded />}
-              className="grow-1"
+              className="grow"
               value={channel}
               placeholder="Channel"
               onChange={(_, value) => setChannel(value ?? 0)}
@@ -318,6 +326,45 @@ export default function VisScatterBlock({
             </div> */}
 
       <div className="relative mt-3">
+        {mouseCollision && controller.capture?.hasXPreview && (
+          <Tooltip
+            sx={{ pointerEvents: 'none' }}
+            title={
+              <Image
+                loading="eager"
+                style={{
+                  imageRendering: 'pixelated',
+                }}
+                width={120}
+                height={120}
+                src={
+                  router.basePath +
+                  `${controller.capture?.path.replace('public', '')}/anim_x/${mouseCollision.sampleIdx}.png`
+                }
+                alt={`Preview of ${mouseCollision.sampleIdx} ${mouseCollision.mouseX}`}
+              />
+            }
+            open={true}
+            variant="outlined"
+            arrow
+          >
+            <div
+              className="absolute select-none"
+              style={{
+                // top: mouseCollision.mouseY,
+                // left: mouseCollision.mouseX,
+
+                top: mouseCollision.sampleY + radius,
+                left: mouseCollision.sampleX,
+
+                // width: 1,
+                // height: 1,
+                // background: 'magenta'
+              }}
+            ></div>
+          </Tooltip>
+        )}
+
         {isLoading && (
           <div
             className="absolute"

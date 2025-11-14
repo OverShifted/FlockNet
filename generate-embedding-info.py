@@ -26,6 +26,7 @@ for embedding in sorted(embeddings.iterdir()):
 				'name': metadata.get('name'),
 				'path': str(embedding.relative_to('.')),
 				'frameCount': metadata.get('frameCount'),
+				'hasXPreview': metadata.get('has_x_preview', False),
 				'classes': [gen_class(webapp_root, name, image) for name, image in metadata.get('classes', [])],
 
 				'variations': [

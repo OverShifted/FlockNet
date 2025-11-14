@@ -2,3 +2,7 @@
 node_modules/
 out/
 public/
+
+.github/
+capture.json
+captures.json

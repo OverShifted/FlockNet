@@ -41,9 +41,13 @@ function remap(
 
 function lerpSample(array: NDArray, frame: number, x: number, y: number) {
   const lastFrame = Math.floor(frame)
-  const t = frame - lastFrame
+
   const a = array.at(lastFrame, x, y) as number
+  if (lastFrame + 1 >= array.shape[0])
+    return a
+  
   const b = array.at(lastFrame + 1, x, y) as number
+  const t = frame - lastFrame
 
   return a * (1 - t) + b * t
 }

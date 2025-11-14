@@ -6,10 +6,10 @@ import { useEffect, useState } from 'react'
 import PlayPauseIcon from './play_pause_icon'
 
 interface PlaybackControlProps {
-  maxFrame: number
+  frameCount: number
 }
 
-export default function PlaybackControl({ maxFrame }: PlaybackControlProps) {
+export default function PlaybackControl({ frameCount }: PlaybackControlProps) {
   const [isPlaying, setIsPlaying] = useState(true)
   const [time, setTime] = useState(0)
   const [fps, setFPS] = useState(30)
@@ -51,7 +51,7 @@ export default function PlaybackControl({ maxFrame }: PlaybackControlProps) {
             )
           }}
           min={1}
-          max={maxFrame}
+          max={frameCount}
           sx={
             isMounted
               ? {
@@ -68,7 +68,7 @@ export default function PlaybackControl({ maxFrame }: PlaybackControlProps) {
 
         <span className="absolute -bottom-0.5 left-0.5">
           <span>{(time + 1).toFixed(3)}</span>
-          <span className="text-gray-500"> / {maxFrame}</span>
+          <span className="text-gray-500"> / {frameCount}</span>
         </span>
       </div>
 

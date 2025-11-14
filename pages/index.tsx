@@ -197,7 +197,7 @@ function Home() {
         </Box>
 
         <Box className="pt-4">
-          <PlaybackControl maxFrame={capture.frameCount} />
+          <PlaybackControl frameCount={capture.frameCount} />
         </Box>
       </Box>
 

@@ -127,9 +127,7 @@ export default function VisScatterBlock({
   // const [colorMap, setColorMap] = useState(colorMaps[0])
   const [isLoading, setIsLoading] = useState(true)
   const [loadPercentage, setLoadPercentage] = useState(0)
-  const [mouseCollision, setMouseCollision] = useState<MouseCollision | null>(
-    null,
-  )
+  const [mouseCollision, setMouseCollision] = useState<MouseCollision | null>(null)
 
   const [renderStyle, setRenderStyle] = useState('dots')
   const [tailFalloff, setTailFalloff] = useState(10)
@@ -328,6 +326,7 @@ export default function VisScatterBlock({
       <div className="relative mt-3">
         {mouseCollision && controller.capture?.hasXPreview && (
           <Tooltip
+            key={mouseCollision.sampleIdx}
             sx={{ pointerEvents: 'none' }}
             title={
               <Image
